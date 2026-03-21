@@ -84,8 +84,3 @@ app.post("/api/career",(req,res)=>{
 });
 
 app.listen(PORT,()=>console.log(`Server running on ${PORT}`));
-app.post("/api/career",(req,res)=>{
-  res.json(generateCareerAdvice(req.body));
-});
-
-app.listen(PORT,()=>console.log("Server running on http://localhost:3000"));
