@@ -3,28 +3,32 @@
 <head>
   <title>AI Career System</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div class="app">
+<div class="main">
 
-  <div class="sidebar">
-    <h2>⚡ History</h2>
-    <div id="history"></div>
+  <h1>🚀 AI Career Counsellor</h1>
+
+  <!-- Welcome -->
+  <div id="welcome">
+    <h2>What describes you best?</h2>
+    <button onclick="startQuiz()">I am confused 😕</button>
+    <button onclick="startQuiz()">I know my interest 🎯</button>
   </div>
 
-  <div class="main">
-    <h1 class="title">⚡ AI Career System</h1>
-
-    <!-- 🔥 Progress Bar -->
-    <div class="progress-container">
-      <div id="progressBar"></div>
-    </div>
-
-    <div id="quiz"></div>
-    <div id="dashboard"></div>
+  <div class="progress-container">
+    <div id="progressBar"></div>
   </div>
+
+  <div id="quiz"></div>
+  <div id="dashboard"></div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
 
 </div>
 
