@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Career System</title>
+  <title>AI Career Counsellor</title>
+
+  <!-- 🔥 MOBILE FIX -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,9 +21,19 @@
     <button onclick="startQuiz()">I know my interest 🎯</button>
   </div>
 
+  <!-- Progress -->
   <div class="progress-container">
     <div id="progressBar"></div>
   </div>
+
+  <div id="quiz"></div>
+  <div id="dashboard"></div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
 
   <div id="quiz"></div>
   <div id="dashboard"></div>
