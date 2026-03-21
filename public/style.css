@@ -68,7 +68,7 @@ p, li {
   font-size: 14px;
 }
 
-/* 🔥 MOBILE FIX */
+/* 🔥 MOBILE RESPONSIVE */
 @media (max-width: 600px) {
   h1 {
     font-size: 20px;
