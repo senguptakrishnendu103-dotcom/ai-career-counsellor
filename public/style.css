@@ -1,79 +1,39 @@
 body {
-  margin: 0;
   font-family: monospace;
-  color: #00ffff;
-  background: linear-gradient(135deg, #020617, #0f172a, #1e293b);
+  background: linear-gradient(135deg,#0f172a,#1e293b);
+  color:#00ffff;
+  text-align:center;
 }
 
-/* Layout */
-.app { display: flex; }
-
-.sidebar {
-  width: 200px;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-}
-
-.main {
-  flex: 1;
-  padding: 20px;
-}
-
-.title {
-  text-align: center;
-  text-shadow: 0 0 10px #00ffff;
-}
-
-/* 🔥 Progress Bar */
-.progress-container {
-  width: 100%;
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  margin: 20px 0;
-}
-
-#progressBar {
-  height: 100%;
-  width: 0%;
-  background: #00ffff;
-  border-radius: 10px;
-  transition: width 0.4s ease;
-}
-
-/* Buttons */
 button {
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #00ffff;
-  background: transparent;
-  color: #00ffff;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  padding:10px;
+  margin:10px;
+  border:1px solid #00ffff;
+  background:transparent;
+  color:#00ffff;
+  cursor:pointer;
 }
 
 button:hover {
-  background: #00ffff;
-  color: black;
-  box-shadow: 0 0 10px #00ffff;
-  transform: scale(1.05);
+  background:#00ffff;
+  color:black;
 }
 
-/* Cards */
+.progress-container {
+  width:80%;
+  margin:auto;
+  height:10px;
+  background:#222;
+}
+
+#progressBar {
+  height:100%;
+  width:0%;
+  background:#00ffff;
+}
+
 .card {
-  padding: 10px;
-  background: rgba(0,0,0,0.5);
-  margin: 10px;
-  box-shadow: 0 0 10px #00ffff;
-  white-space: pre-line;
-}
-
-/* Animation */
-.fade-in {
-  animation: fadeIn 0.8s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
+  border:1px solid #00ffff;
+  margin:20px;
+  padding:15px;
 }
