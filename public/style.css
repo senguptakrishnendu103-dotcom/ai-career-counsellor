@@ -1,62 +1,69 @@
 body {
   margin: 0;
-  font-family: monospace;
-  background: linear-gradient(135deg,#0f172a,#1e293b);
-  color: #00ffff;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  color: #1e293b;
   text-align: center;
-  padding: 10px;
 }
 
 /* Container */
 .main {
   max-width: 900px;
   margin: auto;
+  padding: 20px;
 }
 
 /* Title */
 h1 {
-  font-size: 24px;
+  font-size: 28px;
+  margin-bottom: 20px;
 }
 
 /* Buttons */
 button {
-  padding: 12px;
+  padding: 12px 20px;
   margin: 10px;
-  border: 1px solid #00ffff;
-  background: transparent;
-  color: #00ffff;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
   width: 90%;
   max-width: 300px;
+  transition: 0.3s;
 }
 
 button:hover {
-  background: #00ffff;
-  color: black;
+  background: #4338ca;
 }
 
 /* Progress */
 .progress-container {
   width: 100%;
   height: 8px;
-  background: #222;
-  margin: 15px 0;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 20px 0;
 }
 
 #progressBar {
   height: 100%;
   width: 0%;
-  background: #00ffff;
+  background: #4f46e5;
 }
 
 /* Cards */
 .card {
-  border: 1px solid #00ffff;
-  margin: 15px auto;
-  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  margin: 20px auto;
+  padding: 20px;
   width: 90%;
-  max-width: 400px;
-  box-sizing: border-box;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: left;
 }
 
 /* Text */
@@ -66,24 +73,16 @@ h2 {
 
 p, li {
   font-size: 14px;
+  line-height: 1.6;
 }
 
-/* 🔥 MOBILE RESPONSIVE */
+/* Mobile */
 @media (max-width: 600px) {
   h1 {
-    font-size: 20px;
-  }
-
-  h2 {
-    font-size: 18px;
-  }
-
-  button {
-    width: 95%;
+    font-size: 22px;
   }
 
   .card {
-    width: 95%;
-    padding: 12px;
+    padding: 15px;
   }
 }
