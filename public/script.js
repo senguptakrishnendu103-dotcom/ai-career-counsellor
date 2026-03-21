@@ -25,10 +25,18 @@ function showQ(){
 
  updateProgress();
 
- document.getElementById("quiz").innerHTML=
- `<h2>${quiz[i]}</h2>
- <button onclick="answer('yes')">Yes</button>
- <button onclick="answer('no')">No</button>`;
+ const quizBox = document.getElementById("quiz");
+
+ quizBox.style.opacity = 0;
+
+ setTimeout(()=>{
+   quizBox.innerHTML = `
+   <h2>${quiz[i]}</h2>
+   <button onclick="answer('yes')">Yes</button>
+   <button onclick="answer('no')">No</button>
+   `;
+   quizBox.style.opacity = 1;
+ }, 300);
 }
 
 function answer(a){
@@ -59,6 +67,10 @@ async function submit(){
   `;
   document.getElementById("dashboard").appendChild(div);
  });
+
+ document.getElementById("dashboard").innerHTML+=
+ `<button onclick="location.reload()">Restart 🔁</button>`;
+}
 
  document.getElementById("dashboard").innerHTML+=
  `<button onclick="location.reload()">Restart 🔁</button>`;
