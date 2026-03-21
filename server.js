@@ -9,29 +9,44 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// Explanation
-function generateExplanation(score) {
-  let text = "🧠 AI Analysis:\n\n";
+const careers = {
+  tech: {
+    title: "Software Developer",
+    reason: "You have strong logical and problem-solving skills.",
+    roadmap: ["Learn coding", "Build projects", "DSA", "Internships"]
+  },
+  business: {
+    title: "Business Manager",
+    reason: "You show leadership and decision-making ability.",
+    roadmap: ["Learn management", "Leadership skills", "Internships"]
+  },
+  creative: {
+    title: "UI/UX Designer",
+    reason: "You are creative and design-oriented.",
+    roadmap: ["Learn Figma", "UX principles", "Portfolio"]
+  },
+  medical: {
+    title: "Doctor",
+    reason: "You like helping people and care deeply.",
+    roadmap: ["NEET", "MBBS", "Internship"]
+  },
+  law: {
+    title: "Lawyer",
+    reason: "You enjoy arguments and logical reasoning.",
+    roadmap: ["CLAT", "Law degree", "Practice"]
+  },
+  finance: {
+    title: "Financial Analyst",
+    reason: "You are good with numbers and analysis.",
+    roadmap: ["Finance basics", "Excel", "Certifications"]
+  },
+  sports: {
+    title: "Athlete",
+    reason: "You enjoy physical activity and competition.",
+    roadmap: ["Training", "Academy", "Competitions"]
+  }
+};
 
-  Object.entries(score)
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0,3)
-    .forEach(([d])=>{
-      if(d==="tech") text+="⚡ Strong logical thinking\n";
-      if(d==="business") text+="💼 Leadership mindset\n";
-      if(d==="creative") text+="🎨 Creative skills\n";
-      if(d==="medical") text+="🩺 Helping nature\n";
-      if(d==="law") text+="⚖️ Argument & reasoning\n";
-      if(d==="finance") text+="💰 Number handling\n";
-      if(d==="sports") text+="🏃 Active personality\n";
-    });
-
-  text += "\n📈 Suggestions:\n- Focus on top skills\n- Build projects";
-
-  return text;
-}
-
-// AI
 function generateCareerAdvice(user){
   const input=(user.answers||[]).join(" ").toLowerCase();
 
@@ -39,27 +54,36 @@ function generateCareerAdvice(user){
     tech:0,business:0,creative:0,medical:0,law:0,finance:0,sports:0
   };
 
-  if(input.includes("logic")) score.tech+=3;
+  if(input.includes("logical")) score.tech+=3;
   if(input.includes("leader")) score.business+=3;
   if(input.includes("creative")) score.creative+=3;
   if(input.includes("help")) score.medical+=3;
   if(input.includes("argue")) score.law+=3;
   if(input.includes("numbers")) score.finance+=3;
-  if(input.includes("physical")) score.sports+=3;
+  if(input.includes("sports")) score.sports+=3;
 
-  const sorted=Object.entries(score)
+  const sorted = Object.entries(score)
     .sort((a,b)=>b[1]-a[1])
     .slice(0,3);
 
-  const ranking=sorted.map((x,i)=>`#${i+1} → ${x[0]} (${x[1]})`).join("\n");
+  const topCareers = sorted.map(([key,val])=>{
+    return {
+      title:careers[key].title,
+      score:val,
+      confidence: Math.min(95, 60 + val*10),
+      reason: careers[key].reason,
+      roadmap: careers[key].roadmap
+    };
+  });
 
-  return {
-    ranking,
-    scores:score,
-    explanation:generateExplanation(score)
-  };
+  return { topCareers };
 }
 
+app.post("/api/career",(req,res)=>{
+  res.json(generateCareerAdvice(req.body));
+});
+
+app.listen(PORT,()=>console.log(`Server running on ${PORT}`));
 app.post("/api/career",(req,res)=>{
   res.json(generateCareerAdvice(req.body));
 });
