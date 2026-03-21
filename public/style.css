@@ -4,6 +4,7 @@ body {
   background: linear-gradient(135deg, #eef2ff, #f8fafc);
   color: #1e293b;
   text-align: center;
+  overflow-x: hidden;
 }
 
 /* Container */
@@ -17,6 +18,7 @@ body {
 h1 {
   font-size: 28px;
   margin-bottom: 20px;
+  animation: fadeDown 0.8s ease;
 }
 
 /* Buttons */
@@ -31,11 +33,12 @@ button {
   font-size: 14px;
   width: 90%;
   max-width: 300px;
-  transition: 0.3s;
+  transition: all 0.3s ease;
 }
 
 button:hover {
   background: #4338ca;
+  transform: scale(1.05);
 }
 
 /* Progress */
@@ -52,6 +55,12 @@ button:hover {
   height: 100%;
   width: 0%;
   background: #4f46e5;
+  transition: width 0.5s ease;
+}
+
+/* Quiz fade */
+#quiz {
+  transition: opacity 0.3s ease;
 }
 
 /* Cards */
@@ -64,6 +73,30 @@ button:hover {
   max-width: 500px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   text-align: left;
+  animation: fadeUp 0.6s ease;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Text */
@@ -82,6 +115,10 @@ p, li {
     font-size: 22px;
   }
 
+  .card {
+    padding: 15px;
+  }
+}
   .card {
     padding: 15px;
   }
