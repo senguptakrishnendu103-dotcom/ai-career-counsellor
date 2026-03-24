@@ -8,43 +8,35 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// 🔥 Analytics storage
-let analytics = {
-  visitors: 0,
-  careerClicks: {}
-};
+let visitors = 0;
 
-// careers
-const careers = ["Software Developer","AI Engineer","Designer","Manager","Finance Analyst"];
-
-// visitor count
 app.get("/api/visit",(req,res)=>{
-  analytics.visitors++;
-  res.json({visitors: analytics.visitors});
+  visitors++;
+  res.json({visitors});
 });
 
-// career API
 app.post("/api/career",(req,res)=>{
+  const careers = [
+    "Software Engineer",
+    "AI Engineer",
+    "UI/UX Designer",
+    "Business Manager",
+    "Financial Analyst"
+  ];
+
   let results = careers.map(c=>{
-    let score = Math.floor(Math.random()*50)+50;
-
-    // 🔥 track analytics
-    analytics.careerClicks[c] = (analytics.careerClicks[c] || 0) + 1;
-
-    return {title:c,confidence:score};
+    return {
+      title: c,
+      confidence: Math.floor(Math.random()*40)+50
+    };
   });
 
   results.sort((a,b)=>b.confidence-a.confidence);
 
   res.json({
-    explanation:"Here are your best career options:",
+    explanation:"Here are your best career matches:",
     topCareers: results.slice(0,3)
   });
-});
-
-// 🔥 analytics API
-app.get("/api/analytics",(req,res)=>{
-  res.json(analytics);
 });
 
 app.listen(PORT,()=>console.log("Server running"));
