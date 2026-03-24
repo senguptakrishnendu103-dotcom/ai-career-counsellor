@@ -1,11 +1,11 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg,#020617,#0f172a,#1e293b);
+  background: radial-gradient(circle at top,#020617,#020617,#000);
   color: white;
 }
 
-/* Chat layout */
+/* container */
 .chat-container {
   max-width: 700px;
   margin: auto;
@@ -14,52 +14,66 @@ body {
   flex-direction: column;
 }
 
-/* Header */
+/* header */
 .header {
   padding: 15px;
   text-align: center;
+  font-size: 18px;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(10px);
 }
 
-/* Chat box */
+/* chat area */
 .chat-box {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Messages */
+/* message */
 .message {
   max-width: 75%;
   padding: 12px;
-  margin: 10px;
+  margin: 8px;
   border-radius: 12px;
+  animation: fadeIn 0.4s ease;
 }
 
-/* User */
+/* user */
 .user {
-  background: #3b82f6;
+  background: linear-gradient(135deg,#3b82f6,#6366f1);
   align-self: flex-end;
 }
 
-/* AI */
+/* ai */
 .ai {
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(10px);
   align-self: flex-start;
 }
 
-/* Input */
-.input-area {
-  padding: 10px;
-  text-align: center;
-}
-
+/* button */
 button {
-  padding: 10px 20px;
+  padding: 12px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: linear-gradient(135deg,#3b82f6,#6366f1);
   color: white;
+  width: 90%;
+  max-width: 300px;
+  margin: 10px auto;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #3b82f6;
+}
+
+/* animation */
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
 }
