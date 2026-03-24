@@ -1,50 +1,62 @@
-let answers=[];
-let i=0;
-
 const questions=[
-"Do you like logic?",
-"Do you like leadership?",
-"Are you creative?"
+"Do you like logical thinking?",
+"Do you enjoy leadership?",
+"Are you creative?",
+"Do you like working with numbers?"
 ];
+
+let i=0;
+let answers=[];
 
 function addMessage(text,type){
  const msg=document.createElement("div");
  msg.className="message "+type;
  msg.innerText=text;
  document.getElementById("chatBox").appendChild(msg);
+ msg.scrollIntoView();
 }
 
-// visitor
+// visitors
 fetch("/api/visit")
 .then(r=>r.json())
 .then(d=>{
- addMessage("👀 "+d.visitors+" people visited","ai");
+ document.getElementById("visitor").innerText=
+ `👀 ${d.visitors} users visited`;
 });
 
 function startQuiz(){
+ i=0;
+ answers=[];
+ document.getElementById("chatBox").innerHTML="";
  ask();
 }
 
 function ask(){
  if(i>=questions.length) return submit();
+
  addMessage(questions[i],"ai");
 
- const box=document.createElement("div");
- box.innerHTML=`
- <button onclick="answer('Yes')">Yes</button>
- <button onclick="answer('No')">No</button>
+ const options=document.createElement("div");
+ options.className="options";
+
+ options.innerHTML=`
+   <button onclick="answer('Yes')">Yes</button>
+   <button onclick="answer('No')">No</button>
  `;
- document.getElementById("chatBox").appendChild(box);
+
+ document.getElementById("chatBox").appendChild(options);
 }
 
 function answer(a){
  addMessage(a,"user");
- answers.push(a);
+ answers.push(a+" "+questions[i]);
  i++;
  ask();
 }
 
 async function submit(){
+ addMessage("Analyzing your profile...","ai");
+
  const res=await fetch("/api/career",{
   method:"POST",
   headers:{"Content-Type":"application/json"},
@@ -56,31 +68,6 @@ async function submit(){
  addMessage(data.explanation,"ai");
 
  data.topCareers.forEach(c=>{
-   addMessage(c.title+" "+c.confidence+"%","ai");
+   addMessage(`${c.title} (${c.confidence}%)`,"ai");
  });
-
- loadAnalytics();
-}
-
-// 🔥 LOAD REAL ANALYTICS
-async function loadAnalytics(){
- const res = await fetch("/api/analytics");
- const data = await res.json();
-
- const canvas=document.getElementById("analyticsChart");
- const ctx=canvas.getContext("2d");
-
- let x=20;
-
- for(let key in data.careerClicks){
-   let val=data.careerClicks[key];
-
-   ctx.fillStyle="#3b82f6";
-   ctx.fillRect(x,200-val,40,val);
-
-   ctx.fillStyle="white";
-   ctx.fillText(key,x,220);
-
-   x+=80;
- }
 }
