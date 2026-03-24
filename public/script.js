@@ -1,7 +1,8 @@
 const questions=[
-"Do you enjoy logical thinking?",
-"Do you like leadership?",
-"Are you creative?"
+"Do you enjoy solving logical problems?",
+"Do you like leadership roles?",
+"Are you creative?",
+"Do you like working with numbers?"
 ];
 
 let i=0;
@@ -15,34 +16,83 @@ function addMessage(text,type){
  msg.scrollIntoView();
 }
 
+// typing effect
+function typingEffect(text,callback){
+ let i=0;
+ const box=document.getElementById("chatBox");
+
+ const msg=document.createElement("div");
+ msg.className="message ai";
+ box.appendChild(msg);
+
+ let interval=setInterval(()=>{
+   msg.innerText=text.slice(0,i);
+   i++;
+   if(i>text.length){
+     clearInterval(interval);
+     if(callback) callback();
+   }
+ },20);
+}
+
 function startQuiz(){
- addMessage("Let's find your career 🚀","ai");
- askQuestion();
+ typingEffect("Hey 👋 I'm your AI career assistant.",()=>{
+   askQuestion();
+ });
 }
 
 function askQuestion(){
  if(i>=questions.length) return submit();
 
- addMessage(questions[i],"ai");
+ typingEffect(questions[i],()=>{
+   showOptions();
+ });
+}
 
- setTimeout(()=>{
-   addMessage("Yes","user");
-   answers.push("yes "+questions[i]);
-   i++;
-   askQuestion();
- },1000);
+// 🔥 REAL USER INPUT
+function showOptions(){
+ const box=document.getElementById("chatBox");
+
+ const container=document.createElement("div");
+ container.className="message ai";
+
+ container.innerHTML=`
+   <button onclick="selectAnswer('Yes')">Yes</button>
+   <button onclick="selectAnswer('No')">No</button>
+ `;
+
+ box.appendChild(container);
+ container.scrollIntoView();
+}
+
+function selectAnswer(ans){
+ addMessage(ans,"user");
+
+ answers.push(ans+" "+questions[i]);
+ i++;
+
+ askQuestion();
 }
 
 async function submit(){
- addMessage("Analyzing your answers...","ai");
+ typingEffect("Analyzing your personality deeply...",async ()=>{
+   const res=await fetch("/api/career",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({answers})
+   });
 
- const res=await fetch("/api/career",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({answers})
+   const data=await res.json();
+
+   typingEffect(data.explanation);
+
+   data.topCareers.forEach((c,index)=>{
+     setTimeout(()=>{
+       typingEffect(`${c.title} (${c.confidence}%)\n${c.reason}`);
+     },1000*(index+1));
+   });
  });
-
- const data=await res.json();
+}
 
  data.topCareers.forEach(c=>{
    addMessage(`${c.title} (${c.confidence}%)\n${c.reason}`,"ai");
