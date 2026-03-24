@@ -1,8 +1,9 @@
 body{
  margin:0;
- font-family:'Segoe UI',sans-serif;
  background:#020617;
  color:white;
+ font-family:sans-serif;
+ text-align:center;
 }
 
 canvas{
@@ -12,77 +13,27 @@ canvas{
  z-index:-1;
 }
 
-/* app container */
-.app{
- max-width:700px;
- margin:auto;
- padding:10px;
+#chatBox{
+ margin:20px;
 }
 
-/* header */
-.header{
- text-align:center;
- font-size:22px;
- margin:10px 0;
-}
-
-/* visitor */
-.visitor{
- text-align:center;
- font-size:12px;
- color:#aaa;
-}
-
-/* chat */
-.chat-box{
- display:flex;
- flex-direction:column;
- gap:10px;
- padding:10px;
- height:60vh;
- overflow-y:auto;
-}
-
-/* message */
-.message{
- padding:12px;
- border-radius:12px;
- max-width:70%;
- word-wrap:break-word;
-}
-
-/* user */
-.user{
- background:#3b82f6;
- align-self:flex-end;
-}
-
-/* ai */
-.ai{
- background:rgba(255,255,255,0.08);
- align-self:flex-start;
-}
-
-/* buttons container */
-.options{
- display:flex;
- gap:10px;
- margin:5px;
-}
-
-/* buttons */
 button{
- padding:10px 15px;
+ padding:10px;
+ margin:10px;
+ background:#3b82f6;
  border:none;
- border-radius:10px;
- background:linear-gradient(135deg,#3b82f6,#6366f1);
  color:white;
- cursor:pointer;
+ border-radius:8px;
 }
 
-/* footer */
-.footer{
- text-align:center;
+.message{
+ margin:10px;
+ padding:10px;
+ border-radius:10px;
+}
+
+.user{background:#3b82f6;}
+.ai{background:#111;}
  margin-top:10px;
  font-size:12px;
  color:#aaa;
