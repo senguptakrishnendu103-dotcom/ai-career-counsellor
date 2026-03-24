@@ -1,78 +1,60 @@
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at top,#020617,#020617,#000);
-  color: white;
+body{
+  margin:0;
+  font-family:sans-serif;
+  background: radial-gradient(circle,#020617,#000);
+  color:white;
 }
 
-/* container */
-.chat-container {
-  max-width: 700px;
-  margin: auto;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+.header{
+  text-align:center;
+  padding:15px;
+  font-size:20px;
 }
 
-/* header */
-.header {
-  padding: 15px;
-  text-align: center;
-  font-size: 18px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
+.visitor{
+  text-align:center;
+  font-size:12px;
+  color:#aaa;
 }
 
-/* chat area */
-.chat-box {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+.chat-box{
+  height:70vh;
+  overflow:auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
 }
 
-/* message */
-.message {
-  max-width: 75%;
-  padding: 12px;
-  margin: 8px;
-  border-radius: 12px;
-  animation: fadeIn 0.4s ease;
+.message{
+  padding:10px;
+  margin:8px;
+  border-radius:10px;
+  max-width:70%;
 }
 
-/* user */
-.user {
-  background: linear-gradient(135deg,#3b82f6,#6366f1);
-  align-self: flex-end;
+.user{
+  background:#3b82f6;
+  align-self:flex-end;
 }
 
-/* ai */
-.ai {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
-  align-self: flex-start;
+.ai{
+  background:rgba(255,255,255,0.1);
 }
 
-/* button */
-button {
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg,#3b82f6,#6366f1);
-  color: white;
-  width: 90%;
-  max-width: 300px;
-  margin: 10px auto;
-  transition: 0.3s;
+button{
+  padding:10px;
+  margin:10px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(#3b82f6,#6366f1);
+  color:white;
 }
 
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px #3b82f6;
-}
-
-/* animation */
+.footer{
+  text-align:center;
+  font-size:12px;
+  padding:10px;
+}/
 @keyframes fadeIn {
   from {opacity:0; transform:translateY(20px);}
   to {opacity:1; transform:translateY(0);}
