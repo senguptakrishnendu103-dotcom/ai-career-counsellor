@@ -1,30 +1,35 @@
-let scene=new THREE.Scene();
-let camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
-let renderer=new THREE.WebGLRenderer({alpha:true});
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.domElement);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-camera.position.z=5;
+let particles = [];
 
-let geo=new THREE.BufferGeometry();
-let vertices=[];
-
-for(let i=0;i<1000;i++){
- vertices.push(Math.random()*10-5);
+for(let i=0;i<80;i++){
+ particles.push({
+   x:Math.random()*canvas.width,
+   y:Math.random()*canvas.height,
+   r:Math.random()*2,
+   dx:Math.random()-0.5,
+   dy:Math.random()-0.5
+ });
 }
 
-geo.setAttribute("position",new THREE.Float32BufferAttribute(vertices,3));
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
 
-let mat=new THREE.PointsMaterial({color:0x00ffff,size:0.05});
-let mesh=new THREE.Points(geo,mat);
+ particles.forEach(p=>{
+   ctx.beginPath();
+   ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+   ctx.fillStyle="#3b82f6";
+   ctx.fill();
 
-scene.add(mesh);
+   p.x+=p.dx;
+   p.y+=p.dy;
+ });
 
-function animate(){
- requestAnimationFrame(animate);
- mesh.rotation.y+=0.001;
- renderer.render(scene,camera);
+ requestAnimationFrame(draw);
 }
 
-animate();
+draw();
