@@ -8,63 +8,43 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-let visitors = 0;
-
-// careers
-const careers = {
-  tech: {
-    titles:["Software Developer","AI Engineer","Cybersecurity Expert"],
-    keywords:["logical","problem","code"],
-  },
-  business: {
-    titles:["Entrepreneur","Manager","Consultant"],
-    keywords:["leader","manage","decision"],
-  },
-  creative: {
-    titles:["Designer","Content Creator","Video Editor"],
-    keywords:["creative","design","visual"],
-  },
-  finance: {
-    titles:["Financial Analyst","Accountant"],
-    keywords:["numbers","data","analysis"],
-  }
+// 🔥 Analytics storage
+let analytics = {
+  visitors: 0,
+  careerClicks: {}
 };
 
-function random(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
-}
+// careers
+const careers = ["Software Developer","AI Engineer","Designer","Manager","Finance Analyst"];
 
-app.get("/api/visitors",(req,res)=>{
-  visitors++;
-  res.json({visitors});
+// visitor count
+app.get("/api/visit",(req,res)=>{
+  analytics.visitors++;
+  res.json({visitors: analytics.visitors});
 });
 
+// career API
 app.post("/api/career",(req,res)=>{
-  const input = (req.body.answers||[]).join(" ").toLowerCase();
+  let results = careers.map(c=>{
+    let score = Math.floor(Math.random()*50)+50;
 
-  let results=[];
+    // 🔥 track analytics
+    analytics.careerClicks[c] = (analytics.careerClicks[c] || 0) + 1;
 
-  for(let key in careers){
-    let score = Math.floor(Math.random()*40)+40; // 40–80 realistic
-
-    careers[key].keywords.forEach(k=>{
-      if(input.includes(k)) score+=10;
-    });
-
-    score = Math.min(score,95);
-
-    results.push({
-      title: random(careers[key].titles),
-      confidence: score
-    });
-  }
+    return {title:c,confidence:score};
+  });
 
   results.sort((a,b)=>b.confidence-a.confidence);
 
   res.json({
-    explanation: "Based on your responses, here are the most suitable career paths for you:",
+    explanation:"Here are your best career options:",
     topCareers: results.slice(0,3)
   });
+});
+
+// 🔥 analytics API
+app.get("/api/analytics",(req,res)=>{
+  res.json(analytics);
 });
 
 app.listen(PORT,()=>console.log("Server running"));
