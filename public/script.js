@@ -14,15 +14,13 @@ function addMessage(text,type){
  document.getElementById("chatBox").appendChild(msg);
 }
 
-// comments
-function addComment(){
- const text=document.getElementById("commentInput").value;
- const div=document.createElement("div");
- div.innerText=text;
- document.getElementById("commentList").appendChild(div);
-}
+// visitor
+fetch("/api/visit")
+.then(r=>r.json())
+.then(d=>{
+ addMessage("👀 "+d.visitors+" people visited","ai");
+});
 
-// quiz
 function startQuiz(){
  ask();
 }
@@ -30,11 +28,18 @@ function startQuiz(){
 function ask(){
  if(i>=questions.length) return submit();
  addMessage(questions[i],"ai");
+
+ const box=document.createElement("div");
+ box.innerHTML=`
+ <button onclick="answer('Yes')">Yes</button>
+ <button onclick="answer('No')">No</button>
+ `;
+ document.getElementById("chatBox").appendChild(box);
 }
 
-function answer(ans){
- addMessage(ans,"user");
- answers.push(ans);
+function answer(a){
+ addMessage(a,"user");
+ answers.push(a);
  i++;
  ask();
 }
@@ -48,19 +53,34 @@ async function submit(){
 
  const data=await res.json();
 
+ addMessage(data.explanation,"ai");
+
  data.topCareers.forEach(c=>{
    addMessage(c.title+" "+c.confidence+"%","ai");
  });
 
- drawChart(data.topCareers);
+ loadAnalytics();
 }
 
-// chart
-function drawChart(data){
- const canvas=document.getElementById("chart");
+// 🔥 LOAD REAL ANALYTICS
+async function loadAnalytics(){
+ const res = await fetch("/api/analytics");
+ const data = await res.json();
+
+ const canvas=document.getElementById("analyticsChart");
  const ctx=canvas.getContext("2d");
 
- data.forEach((c,i)=>{
-   ctx.fillRect(i*100,100-c.confidence,50,c.confidence);
- });
+ let x=20;
+
+ for(let key in data.careerClicks){
+   let val=data.careerClicks[key];
+
+   ctx.fillStyle="#3b82f6";
+   ctx.fillRect(x,200-val,40,val);
+
+   ctx.fillStyle="white";
+   ctx.fillText(key,x,220);
+
+   x+=80;
+ }
 }
