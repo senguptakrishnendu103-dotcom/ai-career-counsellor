@@ -8,34 +8,25 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// Bigger dataset
+let visitors = 0;
+
+// careers
 const careers = {
   tech: {
-    titles: ["Software Developer", "AI Engineer", "Full Stack Developer"],
-    reasons: [
-      "You show strong logical thinking.",
-      "You enjoy solving complex problems.",
-      "You like structured systems."
-    ],
-    roadmap: ["Learn coding", "Build projects", "DSA", "Internships"]
+    titles:["Software Developer","AI Engineer","Cybersecurity Expert"],
+    keywords:["logical","problem","code"],
   },
   business: {
-    titles: ["Entrepreneur", "Business Manager", "Consultant"],
-    reasons: [
-      "You show leadership skills.",
-      "You enjoy decision-making.",
-      "You like managing people."
-    ],
-    roadmap: ["Business basics", "Communication", "Internships"]
+    titles:["Entrepreneur","Manager","Consultant"],
+    keywords:["leader","manage","decision"],
   },
   creative: {
-    titles: ["UI/UX Designer", "Content Creator"],
-    reasons: [
-      "You are creative.",
-      "You enjoy visuals.",
-      "You think differently."
-    ],
-    roadmap: ["Design tools", "Portfolio", "Freelancing"]
+    titles:["Designer","Content Creator","Video Editor"],
+    keywords:["creative","design","visual"],
+  },
+  finance: {
+    titles:["Financial Analyst","Accountant"],
+    keywords:["numbers","data","analysis"],
   }
 };
 
@@ -43,33 +34,37 @@ function random(arr){
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
-function generateAdvice(user){
-  const input = (user.answers||[]).join(" ").toLowerCase();
-
-  let score={tech:0,business:0,creative:0};
-
-  if(input.includes("logical")) score.tech+=3;
-  if(input.includes("leader")) score.business+=3;
-  if(input.includes("creative")) score.creative+=3;
-
-  const sorted = Object.entries(score)
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0,3);
-
-  const result = sorted.map(([key,val])=>{
-    return {
-      title: random(careers[key].titles),
-      reason: random(careers[key].reasons),
-      confidence: Math.min(95,60+val*10),
-      roadmap: careers[key].roadmap
-    };
-  });
-
-  return { topCareers: result };
-}
+app.get("/api/visitors",(req,res)=>{
+  visitors++;
+  res.json({visitors});
+});
 
 app.post("/api/career",(req,res)=>{
-  res.json(generateAdvice(req.body));
+  const input = (req.body.answers||[]).join(" ").toLowerCase();
+
+  let results=[];
+
+  for(let key in careers){
+    let score = Math.floor(Math.random()*40)+40; // 40–80 realistic
+
+    careers[key].keywords.forEach(k=>{
+      if(input.includes(k)) score+=10;
+    });
+
+    score = Math.min(score,95);
+
+    results.push({
+      title: random(careers[key].titles),
+      confidence: score
+    });
+  }
+
+  results.sort((a,b)=>b.confidence-a.confidence);
+
+  res.json({
+    explanation: "Based on your responses, here are the most suitable career paths for you:",
+    topCareers: results.slice(0,3)
+  });
 });
 
 app.listen(PORT,()=>console.log("Server running"));
