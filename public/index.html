@@ -7,31 +7,45 @@
 </head>
 <body>
 
-<canvas id="bg"></canvas>
+<div class="container">
 
-<div class="app">
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Your AI Career Coach for Professional Success</h1>
+    <p>Get insights, trends, and personalized career guidance</p>
+    <button onclick="startChat()">Get Started</button>
+  </section>
 
-  <h1>🚀 CareerAI Pro</h1>
+  <!-- INSIGHTS -->
+  <section class="cards">
+    <div class="card" id="growth"></div>
+    <div class="card" id="demand"></div>
+    <div class="card" id="visitors"></div>
+  </section>
 
-  <div id="visitor"></div>
+  <!-- SKILLS -->
+  <section>
+    <h2>🔥 Top Skills</h2>
+    <div id="skills" class="skills"></div>
+  </section>
 
-  <div id="chatBox"></div>
+  <!-- SALARY CHART -->
+  <section>
+    <h2>💰 Salary Insights</h2>
+    <canvas id="chart" width="400" height="200"></canvas>
+  </section>
 
-  <button onclick="startQuiz()">Start Chat</button>
-
-  <h2>📊 Dashboard</h2>
-  <canvas id="chart" width="300" height="200"></canvas>
+  <!-- CHAT -->
+  <section>
+    <h2>🤖 AI Career Assistant</h2>
+    <div id="chatBox"></div>
+  </section>
 
 </div>
 
-<script src="particles.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
-</div>
-
-<script src="particles.js"></script>
 <script src="script.js"></script>
 
 </body>
