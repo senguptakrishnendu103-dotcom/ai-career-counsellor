@@ -8,34 +8,49 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
+// 🔥 Industry data
+const skills = ["Python","JavaScript","AI","Cloud","Data Science","Cybersecurity"];
+
+const salaries = [
+  {role:"Software Engineer", value:120},
+  {role:"Data Scientist", value:140},
+  {role:"AI Engineer", value:160},
+  {role:"Frontend Dev", value:110},
+  {role:"Backend Dev", value:130}
+];
+
+// analytics
 let visitors = 0;
 
-app.get("/api/visit",(req,res)=>{
+app.get("/api/data",(req,res)=>{
   visitors++;
-  res.json({visitors});
+  res.json({
+    visitors,
+    growth: (Math.random()*10).toFixed(1),
+    demand: "High",
+    skills,
+    salaries
+  });
 });
 
+// career AI
 app.post("/api/career",(req,res)=>{
-  const careers = [
+  const roles=[
     "Software Engineer",
     "AI Engineer",
+    "Product Manager",
     "UI/UX Designer",
-    "Business Manager",
-    "Financial Analyst"
+    "Data Analyst"
   ];
 
-  let results = careers.map(c=>{
-    return {
-      title: c,
-      confidence: Math.floor(Math.random()*40)+50
-    };
-  });
-
-  results.sort((a,b)=>b.confidence-a.confidence);
+  const result = roles.map(r=>({
+    title:r,
+    confidence: Math.floor(Math.random()*40)+60
+  }));
 
   res.json({
-    explanation:"Here are your best career matches:",
-    topCareers: results.slice(0,3)
+    message:"Based on your profile, here are your best career options:",
+    careers: result.slice(0,3)
   });
 });
 
