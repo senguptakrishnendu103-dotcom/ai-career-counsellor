@@ -3,42 +3,66 @@
 <head>
   <title>AI Career Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- 🌌 Background Canvas -->
 <canvas id="bg"></canvas>
 
-<div class="header">🚀 AI Career Assistant</div>
+<!-- 🔝 Header -->
+<div class="header">
+  🤖 AI Career Assistant
+</div>
 
-<div id="visitor"></div>
+<!-- 👀 Visitor Count -->
+<div id="visitor" class="visitor"></div>
 
+<!-- 💬 Chat Section -->
 <div id="chatBox" class="chat-box"></div>
 
+<!-- ▶ Start Button -->
 <div class="input-area">
-  <button onclick="startQuiz()">Start Chat</button>
+  <button onclick="startQuiz()">Start Career Chat 🚀</button>
 </div>
 
-<!-- ⭐ Rating -->
+<!-- ⭐ Rating System -->
 <div class="rating">
-  <h3>Rate this platform ⭐</h3>
+  <h3>⭐ Rate this platform</h3>
   <div id="stars">
-    ★ ★ ★ ★ ★
+    <span onclick="rate(1)">★</span>
+    <span onclick="rate(2)">★</span>
+    <span onclick="rate(3)">★</span>
+    <span onclick="rate(4)">★</span>
+    <span onclick="rate(5)">★</span>
   </div>
+  <p id="ratingMsg"></p>
 </div>
 
-<!-- 💬 Comments -->
+<!-- 💬 Comment System -->
 <div class="comments">
   <h3>💬 Feedback</h3>
-  <input id="commentInput" placeholder="Write something...">
+  <input id="commentInput" placeholder="Write your feedback...">
   <button onclick="addComment()">Post</button>
   <div id="commentList"></div>
 </div>
 
-<!-- 📊 Chart -->
-<canvas id="chart"></canvas>
+<!-- 📊 Analytics Dashboard -->
+<div class="analytics">
+  <h3>📊 Career Trends</h3>
+  <canvas id="analyticsChart" width="300" height="250"></canvas>
+</div>
 
+<!-- 📌 Footer -->
+<div class="footer">
+  🚀 Built with AI | Recommend this platform if you like it!
+</div>
+
+<!-- JS FILES -->
 <script src="particles.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
