@@ -1,8 +1,8 @@
 const questions=[
-"Do you enjoy solving logical problems?",
-"Do you like leadership roles?",
+"Do you like logical thinking?",
+"Do you enjoy leadership?",
 "Are you creative?",
-"Do you like working with numbers?"
+"Do you like numbers?"
 ];
 
 let i=0;
@@ -16,80 +16,53 @@ function addMessage(text,type){
  msg.scrollIntoView();
 }
 
-// typing effect
-function typingEffect(text,callback){
- let i=0;
- const box=document.getElementById("chatBox");
-
- const msg=document.createElement("div");
- msg.className="message ai";
- box.appendChild(msg);
-
- let interval=setInterval(()=>{
-   msg.innerText=text.slice(0,i);
-   i++;
-   if(i>text.length){
-     clearInterval(interval);
-     if(callback) callback();
-   }
- },20);
-}
+// visitors
+fetch("/api/visitors")
+.then(r=>r.json())
+.then(d=>{
+ document.getElementById("visitor").innerText=
+ `👀 ${d.visitors} people visited`;
+});
 
 function startQuiz(){
- typingEffect("Hey 👋 I'm your AI career assistant.",()=>{
-   askQuestion();
- });
+ addMessage("Let's find your career 🚀","ai");
+ ask();
 }
 
-function askQuestion(){
+function ask(){
  if(i>=questions.length) return submit();
 
- typingEffect(questions[i],()=>{
-   showOptions();
- });
-}
+ addMessage(questions[i],"ai");
 
-// 🔥 REAL USER INPUT
-function showOptions(){
- const box=document.getElementById("chatBox");
-
- const container=document.createElement("div");
- container.className="message ai";
-
- container.innerHTML=`
-   <button onclick="selectAnswer('Yes')">Yes</button>
-   <button onclick="selectAnswer('No')">No</button>
+ const box=document.createElement("div");
+ box.innerHTML=`
+ <button onclick="answer('Yes')">Yes</button>
+ <button onclick="answer('No')">No</button>
  `;
-
- box.appendChild(container);
- container.scrollIntoView();
+ document.getElementById("chatBox").appendChild(box);
 }
 
-function selectAnswer(ans){
- addMessage(ans,"user");
-
- answers.push(ans+" "+questions[i]);
+function answer(a){
+ addMessage(a,"user");
+ answers.push(a+" "+questions[i]);
  i++;
-
- askQuestion();
+ ask();
 }
 
 async function submit(){
- typingEffect("Analyzing your personality deeply...",async ()=>{
-   const res=await fetch("/api/career",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({answers})
-   });
+ addMessage("Analyzing...","ai");
 
-   const data=await res.json();
+ const res=await fetch("/api/career",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({answers})
+ });
 
-   typingEffect(data.explanation);
+ const data=await res.json();
 
-   data.topCareers.forEach((c,index)=>{
-     setTimeout(()=>{
-       typingEffect(`${c.title} (${c.confidence}%)\n${c.reason}`);
-     },1000*(index+1));
-   });
+ addMessage(data.explanation,"ai");
+
+ data.topCareers.forEach(c=>{
+   addMessage(`${c.title} (${c.confidence}%)`,"ai");
  });
 }
