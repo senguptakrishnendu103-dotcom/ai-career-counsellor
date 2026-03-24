@@ -8,126 +8,60 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// 🔥 BIGGER DATASET
+// Bigger dataset
 const careers = {
   tech: {
-    titles: ["Software Developer", "AI Engineer", "Web Developer"],
+    titles: ["Software Developer", "AI Engineer", "Full Stack Developer"],
     reasons: [
-      "You have strong logical thinking.",
+      "You show strong logical thinking.",
       "You enjoy solving complex problems.",
       "You like structured systems."
     ],
-    roadmap: [
-      "Learn Programming (JS/Python)",
-      "Build Real Projects",
-      "Learn Data Structures",
-      "Apply for internships"
-    ]
+    roadmap: ["Learn coding", "Build projects", "DSA", "Internships"]
   },
   business: {
-    titles: ["Business Manager", "Entrepreneur", "Consultant"],
+    titles: ["Entrepreneur", "Business Manager", "Consultant"],
     reasons: [
       "You show leadership skills.",
       "You enjoy decision-making.",
       "You like managing people."
     ],
-    roadmap: [
-      "Learn business fundamentals",
-      "Improve communication",
-      "Do internships",
-      "Start small projects"
-    ]
+    roadmap: ["Business basics", "Communication", "Internships"]
   },
   creative: {
-    titles: ["UI/UX Designer", "Graphic Designer", "Content Creator"],
+    titles: ["UI/UX Designer", "Content Creator"],
     reasons: [
       "You are creative.",
-      "You enjoy design and visuals.",
+      "You enjoy visuals.",
       "You think differently."
     ],
-    roadmap: [
-      "Learn design tools",
-      "Build portfolio",
-      "Freelance projects",
-      "Apply for roles"
-    ]
-  },
-  medical: {
-    titles: ["Doctor", "Nurse", "Healthcare Specialist"],
-    reasons: [
-      "You like helping people.",
-      "You care about others.",
-      "You are empathetic."
-    ],
-    roadmap: [
-      "Prepare for entrance exams",
-      "Medical degree",
-      "Internship",
-      "Specialization"
-    ]
-  },
-  law: {
-    titles: ["Lawyer", "Legal Advisor"],
-    reasons: [
-      "You enjoy arguments.",
-      "You think logically.",
-      "You like debating."
-    ],
-    roadmap: [
-      "Prepare for CLAT",
-      "Law degree",
-      "Internships",
-      "Practice law"
-    ]
-  },
-  finance: {
-    titles: ["Financial Analyst", "Investment Banker"],
-    reasons: [
-      "You like numbers.",
-      "You enjoy analysis.",
-      "You think strategically."
-    ],
-    roadmap: [
-      "Learn finance basics",
-      "Excel & analytics",
-      "Certifications",
-      "Internships"
-    ]
+    roadmap: ["Design tools", "Portfolio", "Freelancing"]
   }
 };
 
-// 🔥 RANDOMIZER (NO SAME RESPONSE)
 function random(arr){
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
-// 🔥 SMART AI
 function generateAdvice(user){
-  const input = (user.answers || []).join(" ").toLowerCase();
+  const input = (user.answers||[]).join(" ").toLowerCase();
 
-  let score = {
-    tech:0,business:0,creative:0,medical:0,law:0,finance:0
-  };
+  let score={tech:0,business:0,creative:0};
 
   if(input.includes("logical")) score.tech+=3;
   if(input.includes("leader")) score.business+=3;
   if(input.includes("creative")) score.creative+=3;
-  if(input.includes("help")) score.medical+=3;
-  if(input.includes("argue")) score.law+=3;
-  if(input.includes("number")) score.finance+=3;
 
   const sorted = Object.entries(score)
     .sort((a,b)=>b[1]-a[1])
     .slice(0,3);
 
   const result = sorted.map(([key,val])=>{
-    const data = careers[key];
-
     return {
-      title: random(data.titles),
-      reason: random(data.reasons),
-      confidence: Math.min(95, 60 + val*10),
-      roadmap: data.roadmap
+      title: random(careers[key].titles),
+      reason: random(careers[key].reasons),
+      confidence: Math.min(95,60+val*10),
+      roadmap: careers[key].roadmap
     };
   });
 
