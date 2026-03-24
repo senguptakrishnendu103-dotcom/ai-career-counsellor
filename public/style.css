@@ -1,40 +1,69 @@
 body{
  margin:0;
+ font-family:sans-serif;
  background:#020617;
  color:white;
- font-family:sans-serif;
+}
+
+.container{
+ max-width:900px;
+ margin:auto;
+ padding:20px;
+}
+
+/* hero */
+.hero{
  text-align:center;
+ margin-bottom:40px;
 }
 
-canvas{
- position:fixed;
- top:0;
- left:0;
- z-index:-1;
-}
-
-#chatBox{
- margin:20px;
+.hero h1{
+ font-size:32px;
 }
 
 button{
- padding:10px;
- margin:10px;
+ padding:10px 20px;
  background:#3b82f6;
  border:none;
+ border-radius:10px;
  color:white;
+}
+
+/* cards */
+.cards{
+ display:flex;
+ gap:10px;
+}
+
+.card{
+ background:#111;
+ padding:20px;
+ border-radius:10px;
+ flex:1;
+}
+
+/* skills */
+.skills span{
+ background:#222;
+ padding:8px;
+ margin:5px;
+ display:inline-block;
  border-radius:8px;
 }
 
-.message{
- margin:10px;
+/* chat */
+#chatBox{
+ background:#111;
  padding:10px;
+ margin-top:10px;
  border-radius:10px;
 }
 
-.user{background:#3b82f6;}
-.ai{background:#111;}
- margin-top:10px;
- font-size:12px;
- color:#aaa;
+.message{
+ margin:5px;
+ padding:8px;
+ border-radius:8px;
 }
+
+.ai{background:#222;}
+.user{background:#3b82f6;}
