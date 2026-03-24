@@ -16,7 +16,7 @@ function addMessage(text,type){
  msg.scrollIntoView();
 }
 
-// typing effect
+// 🔥 typing effect
 function typingEffect(text,callback){
  let i=0;
  const box=document.getElementById("chatBox");
@@ -45,33 +45,14 @@ function askQuestion(){
  if(i>=questions.length) return submit();
 
  typingEffect(questions[i],()=>{
-   showOptions();
+   setTimeout(()=>{
+     const reply=Math.random()>0.5?"Yes":"No";
+     addMessage(reply,"user");
+     answers.push(reply+" "+questions[i]);
+     i++;
+     askQuestion();
+   },800);
  });
-}
-
-// 🔥 REAL USER INPUT
-function showOptions(){
- const box=document.getElementById("chatBox");
-
- const container=document.createElement("div");
- container.className="message ai";
-
- container.innerHTML=`
-   <button onclick="selectAnswer('Yes')">Yes</button>
-   <button onclick="selectAnswer('No')">No</button>
- `;
-
- box.appendChild(container);
- container.scrollIntoView();
-}
-
-function selectAnswer(ans){
- addMessage(ans,"user");
-
- answers.push(ans+" "+questions[i]);
- i++;
-
- askQuestion();
 }
 
 async function submit(){
@@ -86,15 +67,10 @@ async function submit(){
 
    typingEffect(data.explanation);
 
-   data.topCareers.forEach((c,index)=>{
+   data.topCareers.forEach(c=>{
      setTimeout(()=>{
        typingEffect(`${c.title} (${c.confidence}%)\n${c.reason}`);
-     },1000*(index+1));
+     },1000);
    });
- });
-}
-
- data.topCareers.forEach(c=>{
-   addMessage(`${c.title} (${c.confidence}%)\n${c.reason}`,"ai");
  });
 }
