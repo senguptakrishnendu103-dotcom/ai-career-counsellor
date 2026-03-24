@@ -1,60 +1,50 @@
-const quiz=[
+const questions=[
 "Do you enjoy logical thinking?",
 "Do you like leadership?",
-"Are you creative?",
-"Do you like helping others?",
-"Do you like arguments?",
-"Do you like numbers?"
+"Are you creative?"
 ];
 
-let ans=[],i=0;
+let i=0;
+let answers=[];
+
+function addMessage(text,type){
+ const msg=document.createElement("div");
+ msg.className="message "+type;
+ msg.innerText=text;
+ document.getElementById("chatBox").appendChild(msg);
+ msg.scrollIntoView();
+}
 
 function startQuiz(){
- document.getElementById("welcome").style.display="none";
- showQ();
+ addMessage("Let's find your career 🚀","ai");
+ askQuestion();
 }
 
-function updateProgress(){
- document.getElementById("progressBar").style.width=(i/quiz.length)*100+"%";
-}
+function askQuestion(){
+ if(i>=questions.length) return submit();
 
-function showQ(){
- if(i>=quiz.length) return submit();
+ addMessage(questions[i],"ai");
 
- updateProgress();
-
- document.getElementById("quiz").innerHTML=
- `<h2>${quiz[i]}</h2>
- <button onclick="answer('yes')">Yes</button>
- <button onclick="answer('no')">No</button>`;
-}
-
-function answer(a){
- ans.push(a+" "+quiz[i]);
- i++;showQ();
+ setTimeout(()=>{
+   addMessage("Yes","user");
+   answers.push("yes "+questions[i]);
+   i++;
+   askQuestion();
+ },1000);
 }
 
 async function submit(){
- document.getElementById("quiz").innerHTML="Analyzing...";
+ addMessage("Analyzing your answers...","ai");
 
  const res=await fetch("/api/career",{
   method:"POST",
   headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({answers:ans})
+  body:JSON.stringify({answers})
  });
 
  const data=await res.json();
 
- document.getElementById("dashboard").innerHTML="<h2>Top Careers</h2>";
-
  data.topCareers.forEach(c=>{
-  const div=document.createElement("div");
-  div.className="card";
-  div.innerHTML=`
-   <h3>${c.title} (${c.confidence}%)</h3>
-   <p>${c.reason}</p>
-   <ul>${c.roadmap.map(r=>`<li>${r}</li>`).join("")}</ul>
-  `;
-  document.getElementById("dashboard").appendChild(div);
+   addMessage(`${c.title} (${c.confidence}%)\n${c.reason}`,"ai");
  });
 }
