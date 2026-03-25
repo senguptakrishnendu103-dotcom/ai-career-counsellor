@@ -1,34 +1,40 @@
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CareerAI Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+<canvas id="bg"></canvas>
 
-let particles = [];
+<div class="container">
 
-for(let i=0;i<80;i++){
- particles.push({
-  x:Math.random()*canvas.width,
-  y:Math.random()*canvas.height,
-  r:Math.random()*2,
-  dx:Math.random()-0.5,
-  dy:Math.random()-0.5
- });
-}
+  <h1>🚀 CareerAI Pro</h1>
 
-function draw(){
- ctx.clearRect(0,0,canvas.width,canvas.height);
+  <div id="stats"></div>
 
- particles.forEach(p=>{
-  ctx.beginPath();
-  ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-  ctx.fillStyle="#3b82f6";
-  ctx.fill();
+  <!-- SKILLS -->
+  <h2>🔥 Top Skills</h2>
+  <div id="skills"></div>
 
-  p.x+=p.dx;
-  p.y+=p.dy;
- });
+  <!-- CHAT -->
+  <h2>🤖 AI Career Chat</h2>
+  <div id="chatBox"></div>
+  <button onclick="startChat()">Start Chat</button>
 
+  <!-- DASHBOARD -->
+  <h2>📊 Salary Dashboard</h2>
+  <canvas id="chart" width="300" height="200"></canvas>
+
+</div>
+
+<script src="particles.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
  requestAnimationFrame(draw);
 }
 
