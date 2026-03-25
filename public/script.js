@@ -1,153 +1,100 @@
-// ================= LOAD DATA =================
-fetch("/api/data")
-.then(res => res.json())
-.then(data => {
-  document.getElementById("stats").innerText =
-    `👀 Visitors: ${data.visitors}`;
+// ================= ELEMENTS =================
+const resultBox = document.getElementById("result");
 
-  const skillsDiv = document.getElementById("skills");
-  skillsDiv.innerHTML = "";
+// ================= TYPE ANIMATION =================
+function typeText(element, text, speed = 20) {
+  element.innerHTML = "";
+  let i = 0;
 
-  data.skills.forEach(skill => {
-    const span = document.createElement("span");
-    span.innerText = skill;
+  function typing() {
+    if (i < text.length) {
+      element.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
 
-    // 🔥 CLICK EVENT
-    span.onclick = () => loadSkillDetails(skill);
+  typing();
+}
 
-    skillsDiv.appendChild(span);
+// ================= SHOW LOADING =================
+function showTyping() {
+  resultBox.innerHTML = `
+    <div class="card">🤖 AI is thinking...</div>
+  `;
+}
+
+// ================= CAREER SEARCH =================
+async function getCareer() {
+  const input = document.getElementById("interest").value;
+
+  showTyping(); // 🔥 loading effect
+
+  const res = await fetch("/api/career", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ interest: input })
+  });
+
+  const data = await res.json();
+
+  resultBox.innerHTML = "";
+
+  data.careers.forEach(c => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const content = `
+🚀 ${c.role}
+
+💰 Salary: ${c.salary}
+📊 Demand: ${c.demand}
+`;
+
+    resultBox.appendChild(card);
+
+    typeText(card, content); // 🔥 typing animation
+  });
+}
+
+// ================= SKILL CLICK =================
+async function getSkillDetails(skill) {
+  showTyping();
+
+  const res = await fetch("/api/skill-details", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ skill })
+  });
+
+  const data = await res.json();
+
+  resultBox.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const content = `
+🚀 ${data.role}
+
+🗺 Roadmap: ${data.roadmap}
+🧠 Skills: ${data.skills.join(", ")}
+
+📈 Career Path: ${data.levels}
+💰 Salary: ${data.salary}
+📊 Demand: ${data.demand}
+
+🔥 Tip: ${data.tip}
+`;
+
+  resultBox.appendChild(card);
+
+  typeText(card, content, 15); // 🔥 smooth typing
+}
+
+// ================= CLICK BIND =================
+document.querySelectorAll("#skills span").forEach(el => {
+  el.addEventListener("click", () => {
+    getSkillDetails(el.innerText);
   });
 });
-
-// ================= SKILL DETAILS =================
-function loadSkillDetails(skill){
-  fetch("/api/skill-details",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({skill})
-  })
-  .then(res=>res.json())
-  .then(showSkillDetails);
-}
-
-function showSkillDetails(data){
-  const results = document.getElementById("results");
-
-  results.innerHTML = `
-    <div class="card">
-      <h2>🚀 ${data.role}</h2>
-
-      <p><b>🛣️ Roadmap:</b> ${data.roadmap}</p>
-      <p><b>🧠 Skills:</b> ${data.skills.join(", ")}</p>
-      <p><b>💼 Career Path:</b> ${data.levels}</p>
-      <p><b>💰 Salary:</b> ${data.salary}</p>
-      <p><b>📈 Demand:</b> ${data.demand}</p>
-      <p><b>🔥 Tip:</b> ${data.tip}</p>
-    </div>
-  `;
-}
-
-// ================= CHAT SYSTEM =================
-function findCareer() {
-  const input = document.getElementById("interest").value.trim();
-
-  if (!input) {
-    alert("Enter interest first!");
-    return;
-  }
-
-  document.getElementById("quizBox").innerHTML = "";
-  document.getElementById("results").innerHTML = "";
-
-  fetch("/api/career", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({interest: input})
-  })
-  .then(res=>res.json())
-  .then(showResults);
-}
-
-// ================= QUIZ =================
-const questions = [
-  "Do you enjoy coding?",
-  "Are you interested in data?",
-  "Do you like design?",
-  "Interested in cybersecurity?"
-];
-
-let answers = [];
-let currentQ = 0;
-
-function startQuiz(){
-  answers = [];
-  currentQ = 0;
-
-  document.getElementById("quizBox").innerHTML = "";
-  document.getElementById("results").innerHTML = "";
-  document.getElementById("interest").value = "";
-
-  askQuestion();
-}
-
-function askQuestion(){
-  const box = document.getElementById("quizBox");
-
-  if(currentQ >= questions.length){
-    analyzeQuiz();
-    return;
-  }
-
-  box.innerHTML = `
-    <p>${questions[currentQ]}</p>
-    <button onclick="answer('yes')">Yes</button>
-    <button onclick="answer('no')">No</button>
-  `;
-}
-
-function answer(ans){
-  answers.push({q:questions[currentQ],a:ans});
-  currentQ++;
-  askQuestion();
-}
-
-function analyzeQuiz(){
-  let interest="";
-
-  answers.forEach(a=>{
-    if(a.q.includes("coding") && a.a==="yes") interest+=" coding";
-    if(a.q.includes("data") && a.a==="yes") interest+=" data";
-    if(a.q.includes("design") && a.a==="yes") interest+=" design";
-    if(a.q.includes("cyber") && a.a==="yes") interest+=" security";
-  });
-
-  fetch("/api/career",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({interest})
-  })
-  .then(res=>res.json())
-  .then(d=>{
-    document.getElementById("quizBox").innerHTML="";
-    showResults(d);
-  });
-}
-
-// ================= SHOW RESULTS =================
-function showResults(data){
-  const results = document.getElementById("results");
-  results.innerHTML = "";
-
-  data.careers.forEach(c=>{
-    const div=document.createElement("div");
-    div.className="card";
-
-    div.innerHTML = `
-      <h3>${c.role}</h3>
-      <p>💰 Salary: ${c.salary}</p>
-      <p>📈 Demand: ${c.demand}</p>
-    `;
-
-    results.appendChild(div);
-  });
-}
