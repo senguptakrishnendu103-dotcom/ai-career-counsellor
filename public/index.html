@@ -1,58 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>CareerAI Pro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<!-- 🌌 PARTICLE BACKGROUND -->
-<canvas id="bg"></canvas>
+  <!-- Background Canvas -->
+  <canvas id="bg"></canvas>
 
-<!-- MAIN CONTAINER -->
-<div class="container">
+  <div class="container">
 
-  <!-- TITLE -->
-  <h1>🚀 CareerAI Pro</h1>
+    <!-- TITLE -->
+    <h1>🚀 CareerAI Pro</h1>
 
-  <!-- STATS -->
-  <div id="stats"></div>
+    <!-- STATS -->
+    <div id="stats">👀 Visitors: Loading...</div>
 
-  <!-- SKILLS -->
-  <h2>🔥 Top Skills (Trending)</h2>
-  <div id="skills"></div>
+    <!-- SKILLS -->
+    <h2>🔥 Top Skills (Trending)</h2>
 
-  <!-- CHAT / SEARCH -->
-  <h2>🎯 Find Your Career Path</h2>
+    <div id="skills">
+      <span onclick="getSkillDetails('AI/ML')">AI/ML</span>
+      <span onclick="getSkillDetails('React')">React</span>
+      <span onclick="getSkillDetails('Node.js')">Node.js</span>
+      <span onclick="getSkillDetails('Cloud')">Cloud</span>
+      <span onclick="getSkillDetails('Cybersecurity')">Cybersecurity</span>
+      <span onclick="getSkillDetails('Data Science')">Data Science</span>
+      <span onclick="getSkillDetails('Blockchain')">Blockchain</span>
+      <span onclick="getSkillDetails('DevOps')">DevOps</span>
+      <span onclick="getSkillDetails('UI/UX')">UI/UX</span>
+      <span onclick="getSkillDetails('Finance')">Finance</span>
+    </div>
 
-  <div class="search-box">
-    <input 
-      id="interest" 
-      type="text" 
+    <!-- SEARCH -->
+    <h2>🎯 Find Your Career Path</h2>
+
+    <input
+      id="interest"
       placeholder="Enter your interest (AI, coding, design, business...)"
-    >
-    <button onclick="findCareer()">Find Career</button>
+    />
+    <button onclick="getCareer()">Find Career</button>
+
+    <!-- QUIZ -->
+    <div id="quizBox">
+      <h2>🧠 Not sure? Answer a few questions</h2>
+      <button onclick="startQuiz()">Start Questions</button>
+    </div>
+
+    <!-- RESULT -->
+    <div id="result"></div>
+
   </div>
 
-  <!-- RESULTS -->
-  <div id="results"></div>
-
-  <!-- QUESTION SYSTEM (NEW, BELOW EVERYTHING) -->
-  <h2>🧠 Not sure? Answer a few questions</h2>
-  <button onclick="startQuiz()">Start Questions</button>
-
-  <div id="quizBox"></div>
-
-</div>
-
-<!-- SCRIPTS -->
-<script src="particles.js"></script>
-<script src="script.js"></script>
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
 
 </body>
 </html>
