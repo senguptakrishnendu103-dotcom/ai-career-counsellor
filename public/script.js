@@ -11,50 +11,78 @@ fetch("/api/data")
   data.skills.forEach(skill => {
     const span = document.createElement("span");
     span.innerText = skill;
+
+    // 🔥 CLICK EVENT
+    span.onclick = () => loadSkillDetails(skill);
+
     skillsDiv.appendChild(span);
   });
 });
+
+// ================= SKILL DETAILS =================
+function loadSkillDetails(skill){
+  fetch("/api/skill-details",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({skill})
+  })
+  .then(res=>res.json())
+  .then(showSkillDetails);
+}
+
+function showSkillDetails(data){
+  const results = document.getElementById("results");
+
+  results.innerHTML = `
+    <div class="card">
+      <h2>🚀 ${data.role}</h2>
+
+      <p><b>🛣️ Roadmap:</b> ${data.roadmap}</p>
+      <p><b>🧠 Skills:</b> ${data.skills.join(", ")}</p>
+      <p><b>💼 Career Path:</b> ${data.levels}</p>
+      <p><b>💰 Salary:</b> ${data.salary}</p>
+      <p><b>📈 Demand:</b> ${data.demand}</p>
+      <p><b>🔥 Tip:</b> ${data.tip}</p>
+    </div>
+  `;
+}
 
 // ================= CHAT SYSTEM =================
 function findCareer() {
   const input = document.getElementById("interest").value.trim();
 
   if (!input) {
-    alert("Please enter your interest first!");
+    alert("Enter interest first!");
     return;
   }
 
-  // 🔥 CLEAR QUIZ + OLD RESULTS
   document.getElementById("quizBox").innerHTML = "";
   document.getElementById("results").innerHTML = "";
 
   fetch("/api/career", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ interest: input })
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({interest: input})
   })
-    .then(res => res.json())
-    .then(showResults);
+  .then(res=>res.json())
+  .then(showResults);
 }
 
-// ================= QUIZ SYSTEM =================
-
+// ================= QUIZ =================
 const questions = [
   "Do you enjoy coding?",
-  "Are you interested in data and analytics?",
-  "Do you like creative design?",
-  "Are you interested in cybersecurity?"
+  "Are you interested in data?",
+  "Do you like design?",
+  "Interested in cybersecurity?"
 ];
 
 let answers = [];
 let currentQ = 0;
 
-// 🔥 START QUIZ (FULL RESET)
-function startQuiz() {
+function startQuiz(){
   answers = [];
   currentQ = 0;
 
-  // 🔥 CLEAR EVERYTHING
   document.getElementById("quizBox").innerHTML = "";
   document.getElementById("results").innerHTML = "";
   document.getElementById("interest").value = "";
@@ -62,11 +90,10 @@ function startQuiz() {
   askQuestion();
 }
 
-// 🔥 ASK QUESTION
-function askQuestion() {
+function askQuestion(){
   const box = document.getElementById("quizBox");
 
-  if (currentQ >= questions.length) {
+  if(currentQ >= questions.length){
     analyzeQuiz();
     return;
   }
@@ -78,63 +105,49 @@ function askQuestion() {
   `;
 }
 
-// 🔥 SAVE ANSWER
-function answer(ans) {
-  answers.push({
-    question: questions[currentQ],
-    answer: ans
-  });
-
+function answer(ans){
+  answers.push({q:questions[currentQ],a:ans});
   currentQ++;
   askQuestion();
 }
 
-// 🔥 ANALYZE QUIZ
-function analyzeQuiz() {
-  let interest = "";
+function analyzeQuiz(){
+  let interest="";
 
-  answers.forEach(a => {
-    if (a.question.includes("coding") && a.answer === "yes") interest += " coding";
-    if (a.question.includes("data") && a.answer === "yes") interest += " data";
-    if (a.question.includes("design") && a.answer === "yes") interest += " design";
-    if (a.question.includes("cybersecurity") && a.answer === "yes") interest += " security";
+  answers.forEach(a=>{
+    if(a.q.includes("coding") && a.a==="yes") interest+=" coding";
+    if(a.q.includes("data") && a.a==="yes") interest+=" data";
+    if(a.q.includes("design") && a.a==="yes") interest+=" design";
+    if(a.q.includes("cyber") && a.a==="yes") interest+=" security";
   });
 
-  fetch("/api/career", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ interest })
+  fetch("/api/career",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({interest})
   })
-    .then(res => res.json())
-    .then(data => {
-      // 🔥 CLEAR QUIZ AFTER FINISH
-      document.getElementById("quizBox").innerHTML = "";
-      showResults(data);
-    });
+  .then(res=>res.json())
+  .then(d=>{
+    document.getElementById("quizBox").innerHTML="";
+    showResults(d);
+  });
 }
 
 // ================= SHOW RESULTS =================
-function showResults(data) {
+function showResults(data){
   const results = document.getElementById("results");
-
-  // 🔥 ALWAYS CLEAR BEFORE ADDING
   results.innerHTML = "";
 
-  if (!data.careers || data.careers.length === 0) {
-    results.innerHTML = "<p>No results found</p>";
-    return;
-  }
+  data.careers.forEach(c=>{
+    const div=document.createElement("div");
+    div.className="card";
 
-  data.careers.forEach(career => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <h3>${career.role}</h3>
-      <p>💰 Salary: ${career.salary}</p>
-      <p>📈 Demand: ${career.demand}</p>
+    div.innerHTML = `
+      <h3>${c.role}</h3>
+      <p>💰 Salary: ${c.salary}</p>
+      <p>📈 Demand: ${c.demand}</p>
     `;
 
-    results.appendChild(card);
+    results.appendChild(div);
   });
 }
