@@ -1,4 +1,4 @@
-// load data
+// ================= LOAD DATA =================
 fetch("/api/data")
 .then(r=>r.json())
 .then(d=>{
@@ -26,25 +26,30 @@ function findCareer(){
  .then(showResults);
 }
 
-// ================= QUESTION SYSTEM =================
+// ================= QUIZ SYSTEM =================
 
 const questions = [
   "Do you enjoy coding?",
-  "Are you interested in data and analytics?",
-  "Do you like creative design?",
+  "Are you interested in data?",
+  "Do you like design?",
   "Are you interested in cybersecurity?"
 ];
 
 let answers = [];
 let currentQ = 0;
 
+// 🔥 START QUIZ (RESET EVERYTHING)
 function startQuiz(){
- document.getElementById("quizBox").innerHTML = "";
  answers = [];
  currentQ = 0;
+
+ // ✅ CLEAR OLD DISCUSSION
+ document.getElementById("quizBox").innerHTML = "";
+
  askQuestion();
 }
 
+// 🔥 ASK QUESTION
 function askQuestion(){
  if(currentQ >= questions.length){
    analyzeQuiz();
@@ -60,14 +65,14 @@ function askQuestion(){
  `;
 }
 
+// 🔥 STORE ANSWER
 function answer(ans){
  answers.push({q:questions[currentQ], a:ans});
  currentQ++;
  askQuestion();
 }
 
-// ================= QUIZ ANALYSIS =================
-
+// 🔥 ANALYZE QUIZ
 function analyzeQuiz(){
  let interest = "";
 
@@ -84,7 +89,11 @@ function analyzeQuiz(){
   body:JSON.stringify({interest})
  })
  .then(r=>r.json())
- .then(showResults);
+ .then(d=>{
+   // 🔥 CLEAR QUIZ AFTER RESULT
+   document.getElementById("quizBox").innerHTML = "";
+   showResults(d);
+ });
 }
 
 // ================= SHOW RESULTS =================
