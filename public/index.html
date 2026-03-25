@@ -1,31 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>CareerAI Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
+<!-- 🌌 PARTICLE BACKGROUND -->
 <canvas id="bg"></canvas>
 
+<!-- MAIN CONTAINER -->
 <div class="container">
 
+  <!-- TITLE -->
   <h1>🚀 CareerAI Pro</h1>
 
+  <!-- STATS -->
   <div id="stats"></div>
 
-  <h2>🔥 Top Skills</h2>
+  <!-- SKILLS SECTION -->
+  <h2>🔥 Top Skills (Trending)</h2>
   <div id="skills"></div>
 
-  <h2>🎯 Find Your Career</h2>
-  <input id="interest" placeholder="Enter interest (AI, coding, design...)">
-  <button onclick="findCareer()">Find Career</button>
+  <!-- CAREER SEARCH -->
+  <h2>🎯 Find Your Career Path</h2>
 
+  <div class="search-box">
+    <input 
+      id="interest" 
+      type="text" 
+      placeholder="Enter your interest (AI, coding, design, business...)"
+    >
+    <button onclick="findCareer()">Find Career</button>
+  </div>
+
+  <!-- RESULTS -->
   <div id="results"></div>
 
 </div>
 
+<!-- SCRIPTS (IMPORTANT: KEEP AT BOTTOM) -->
 <script src="particles.js"></script>
 <script src="script.js"></script>
 
