@@ -33,7 +33,3 @@ function draw(){
 }
 
 draw();
- requestAnimationFrame(draw);
-}
-
-draw();
