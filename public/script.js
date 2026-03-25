@@ -1,10 +1,13 @@
-// load data
+let dataGlobal;
+
+// load dashboard data
 fetch("/api/data")
 .then(r=>r.json())
 .then(d=>{
- document.getElementById("growth").innerText="Growth: "+d.growth+"%";
- document.getElementById("demand").innerText="Demand: "+d.demand;
- document.getElementById("visitors").innerText="Visitors: "+d.visitors;
+ dataGlobal = d;
+
+ document.getElementById("stats").innerText =
+ `👀 Visitors: ${d.visitors} | 📈 Growth: ${d.growth}% | Demand: ${d.demand}`;
 
  // skills
  d.skills.forEach(s=>{
@@ -15,19 +18,6 @@ fetch("/api/data")
 
  drawChart(d.salaries);
 });
-
-// chart
-function drawChart(data){
- const c=document.getElementById("chart");
- const ctx=c.getContext("2d");
-
- data.forEach((d,i)=>{
-  ctx.fillStyle="#3b82f6";
-  ctx.fillRect(i*80,200-d.value,40,d.value);
-  ctx.fillStyle="white";
-  ctx.fillText(d.role,i*80,190);
- });
-}
 
 // chat
 function addMessage(text,type){
@@ -44,10 +34,24 @@ function startChat(){
    const res=await fetch("/api/career",{method:"POST"});
    const data=await res.json();
 
-   addMessage(data.message,"ai");
+   addMessage(data.explanation,"ai");
 
-   data.careers.forEach(c=>{
-     addMessage(c.title+" ("+c.confidence+"%)","ai");
+   data.topCareers.forEach(c=>{
+     addMessage(`${c.title} (${c.confidence}%)`,"ai");
    });
  },1000);
+}
+
+// chart
+function drawChart(data){
+ const canvas=document.getElementById("chart");
+ const ctx=canvas.getContext("2d");
+
+ data.forEach((d,i)=>{
+   ctx.fillStyle="#3b82f6";
+   ctx.fillRect(i*80,200-d.value,40,d.value);
+
+   ctx.fillStyle="white";
+   ctx.fillText(d.role,i*80,190);
+ });
 }
