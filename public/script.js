@@ -3,7 +3,7 @@ const resultBox = document.getElementById("result");
 const quizBox = document.getElementById("quizBox");
 const statsBox = document.getElementById("stats");
 
-// ================= PARTICLE BACKGROUND =================
+// ================= BACKGROUND =================
 const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
 
@@ -22,7 +22,7 @@ for (let i = 0; i < 80; i++) {
   });
 }
 
-function drawParticles() {
+function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   particles.forEach(p => {
@@ -38,9 +38,9 @@ function drawParticles() {
     if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
   });
 
-  requestAnimationFrame(drawParticles);
+  requestAnimationFrame(animate);
 }
-drawParticles();
+animate();
 
 // ================= VISITOR =================
 async function loadStats() {
@@ -55,84 +55,70 @@ async function loadStats() {
 loadStats();
 
 // ================= TYPE EFFECT =================
-function typeText(element, text, speed = 15) {
-  element.innerHTML = "";
+function typeText(el, text) {
+  el.innerHTML = "";
   let i = 0;
 
   function typing() {
     if (i < text.length) {
-      element.innerHTML += text.charAt(i);
+      el.innerHTML += text[i];
       i++;
-      setTimeout(typing, speed);
+      setTimeout(typing, 10);
     }
   }
 
   typing();
 }
 
-// ================= LOADING =================
-function showTyping() {
-  resultBox.innerHTML = `<div class="card">🤖 AI is thinking...</div>`;
-}
-
 // ================= CAREER SEARCH =================
 async function getCareer() {
   const input = document.getElementById("interest").value;
-
   if (!input) return;
 
-  showTyping();
+  resultBox.innerHTML = `<div class="card">🤖 Thinking...</div>`;
 
-  try {
-    const res = await fetch("/api/career", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ interest: input })
-    });
+  const res = await fetch("/api/career", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({interest: input})
+  });
 
-    const data = await res.json();
+  const data = await res.json();
+  resultBox.innerHTML = "";
 
-    resultBox.innerHTML = "";
+  data.careers.forEach(c => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-    data.careers.forEach(c => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const content = `
+    const text = `
 🚀 ${c.role}
 
 💰 Salary: ${c.salary}
 📊 Demand: ${c.demand}
-`;
+    `;
 
-      resultBox.appendChild(card);
-      typeText(card, content);
-    });
-
-  } catch {
-    resultBox.innerHTML = `<div class="card">❌ Error loading data</div>`;
-  }
+    resultBox.appendChild(card);
+    typeText(card, text);
+  });
 }
 
-// ================= SKILL DETAILS =================
+// ================= SKILL CLICK =================
 async function getSkillDetails(skill) {
-  showTyping();
+  resultBox.innerHTML = `<div class="card">🤖 Loading...</div>`;
 
-  try {
-    const res = await fetch("/api/skill-details", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ skill })
-    });
+  const res = await fetch("/api/skill-details", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({skill})
+  });
 
-    const data = await res.json();
+  const data = await res.json();
+  resultBox.innerHTML = "";
 
-    resultBox.innerHTML = "";
+  const card = document.createElement("div");
+  card.className = "card";
 
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const content = `
+  const text = `
 🚀 ${data.role}
 
 🗺 Roadmap: ${data.roadmap}
@@ -143,14 +129,10 @@ async function getSkillDetails(skill) {
 📊 Demand: ${data.demand}
 
 🔥 Tip: ${data.tip}
-`;
+  `;
 
-    resultBox.appendChild(card);
-    typeText(card, content);
-
-  } catch {
-    resultBox.innerHTML = `<div class="card">❌ Failed to load skill</div>`;
-  }
+  resultBox.appendChild(card);
+  typeText(card, text);
 }
 
 // ================= QUIZ =================
@@ -173,6 +155,8 @@ let answers = {
 function startQuiz() {
   quizIndex = 0;
   answers = { tech: 0, data: 0, design: 0, business: 0 };
+
+  resultBox.innerHTML = ""; // clear old cards
   showQuestion();
 }
 
@@ -182,12 +166,11 @@ function showQuestion() {
     return;
   }
 
-  const current = questions[quizIndex];
+  const q = questions[quizIndex];
 
   quizBox.innerHTML = `
     <div class="card">
-      <h3>${current.q}</h3>
-      <br>
+      <h3>${q.q}</h3><br>
       <button onclick="answerQuiz(true)">Yes</button>
       <button onclick="answerQuiz(false)">No</button>
     </div>
@@ -195,40 +178,41 @@ function showQuestion() {
 }
 
 function answerQuiz(ans) {
-  const field = questions[quizIndex].field;
-
-  if (ans) answers[field]++;
+  if (ans) {
+    answers[questions[quizIndex].field]++;
+  }
 
   quizIndex++;
   showQuestion();
 }
 
-function showResult() {
-  let bestField = Object.keys(answers).reduce((a, b) =>
+// 🔥 IMPORTANT: FETCH FULL DETAILS
+async function showResult() {
+  let best = Object.keys(answers).reduce((a,b)=>
     answers[a] > answers[b] ? a : b
   );
 
-  let suggestion = "";
+  let skillMap = {
+    tech: "React",
+    data: "Data Science",
+    design: "UI/UX",
+    business: "Finance"
+  };
 
-  if (bestField === "tech") {
-    suggestion = "💻 Software Developer / AI Engineer";
-  } else if (bestField === "data") {
-    suggestion = "📊 Data Scientist";
-  } else if (bestField === "design") {
-    suggestion = "🎨 UI/UX Designer";
-  } else {
-    suggestion = "💼 Business / Finance";
-  }
+  const selectedSkill = skillMap[best];
 
   quizBox.innerHTML = `
     <div class="card">
       <h2>🎯 Suggested Career</h2>
       <br>
-      <strong>${suggestion}</strong>
+      <strong>${selectedSkill}</strong>
       <br><br>
       <button onclick="restartQuiz()">🔄 Start Again</button>
     </div>
   `;
+
+  // 🔥 LOAD FULL DETAILS INTO RESULT BOX
+  getSkillDetails(selectedSkill);
 }
 
 function restartQuiz() {
