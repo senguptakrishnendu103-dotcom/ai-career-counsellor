@@ -15,18 +15,14 @@
 
   <div id="stats"></div>
 
-  <!-- SKILLS -->
   <h2>🔥 Top Skills</h2>
   <div id="skills"></div>
 
-  <!-- CHAT -->
-  <h2>🤖 AI Career Chat</h2>
-  <div id="chatBox"></div>
-  <button onclick="startChat()">Start Chat</button>
+  <h2>🎯 Find Your Career</h2>
+  <input id="interest" placeholder="Enter interest (AI, coding, design...)">
+  <button onclick="findCareer()">Find Career</button>
 
-  <!-- DASHBOARD -->
-  <h2>📊 Salary Dashboard</h2>
-  <canvas id="chart" width="300" height="200"></canvas>
+  <div id="results"></div>
 
 </div>
 
@@ -35,7 +31,3 @@
 
 </body>
 </html>
- requestAnimationFrame(draw);
-}
-
-draw();
