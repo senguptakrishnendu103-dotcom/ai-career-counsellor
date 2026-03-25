@@ -1,33 +1,72 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>CareerAI Pro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  color: white;
 
-<canvas id="bg"></canvas>
+  /* 🔥 DARK GRADIENT BACKGROUND */
+  background: radial-gradient(circle at top, #0f172a, #020617);
+}
 
-<div class="container">
+/* 🌌 CANVAS BACKGROUND */
+#bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
 
-  <h1>🚀 CareerAI Pro</h1>
+/* MAIN CONTAINER (KEEP ALIGNMENT SAME) */
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
 
-  <div id="stats"></div>
+/* TITLE */
+h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
 
-  <h2>🔥 Top Skills</h2>
-  <div id="skills"></div>
+/* INPUT */
+input {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin: 10px;
+  width: 70%;
+}
 
-  <h2>🎯 Find Your Career</h2>
-  <input id="interest" placeholder="Enter interest (AI, coding, design...)">
-  <button onclick="findCareer()">Find Career</button>
+/* BUTTON */
+button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(59,130,246,0.4);
+}
 
-  <div id="results"></div>
+/* SKILLS */
+#skills span {
+  background: rgba(255,255,255,0.08);
+  padding: 8px 12px;
+  margin: 5px;
+  display: inline-block;
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+}
 
-</div>
-
-<script src="particles.js"></script>
-<script src="script.js"></script>
-
-</body>
-</html>
+/* RESULT CARDS */
+.card {
+  background: rgba(255,255,255,0.06);
+  padding: 15px;
+  margin: 15px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
