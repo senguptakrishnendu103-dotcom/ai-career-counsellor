@@ -3,7 +3,46 @@ const resultBox = document.getElementById("result");
 const quizBox = document.getElementById("quizBox");
 const statsBox = document.getElementById("stats");
 
-// ================= LOAD VISITOR =================
+// ================= PARTICLE BACKGROUND =================
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2,
+    dx: Math.random() - 0.5,
+    dy: Math.random() - 0.5
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = "#3b82f6";
+    ctx.fill();
+
+    p.x += p.dx;
+    p.y += p.dy;
+
+    if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+  });
+
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ================= VISITOR =================
 async function loadStats() {
   try {
     const res = await fetch("/api/data");
@@ -15,8 +54,8 @@ async function loadStats() {
 }
 loadStats();
 
-// ================= TYPE ANIMATION =================
-function typeText(element, text, speed = 20) {
+// ================= TYPE EFFECT =================
+function typeText(element, text, speed = 15) {
   element.innerHTML = "";
   let i = 0;
 
@@ -70,7 +109,7 @@ async function getCareer() {
       typeText(card, content);
     });
 
-  } catch (err) {
+  } catch {
     resultBox.innerHTML = `<div class="card">❌ Error loading data</div>`;
   }
 }
@@ -107,21 +146,21 @@ async function getSkillDetails(skill) {
 `;
 
     resultBox.appendChild(card);
-    typeText(card, content, 15);
+    typeText(card, content);
 
-  } catch (err) {
+  } catch {
     resultBox.innerHTML = `<div class="card">❌ Failed to load skill</div>`;
   }
 }
 
-// ================= QUIZ SYSTEM =================
+// ================= QUIZ =================
 let quizIndex = 0;
 
 const questions = [
   { q: "Do you enjoy coding?", field: "tech" },
   { q: "Do you like analyzing data?", field: "data" },
   { q: "Are you creative?", field: "design" },
-  { q: "Do you like business and finance?", field: "business" }
+  { q: "Do you like business?", field: "business" }
 ];
 
 let answers = {
@@ -134,7 +173,6 @@ let answers = {
 function startQuiz() {
   quizIndex = 0;
   answers = { tech: 0, data: 0, design: 0, business: 0 };
-
   showQuestion();
 }
 
@@ -147,9 +185,12 @@ function showQuestion() {
   const current = questions[quizIndex];
 
   quizBox.innerHTML = `
-    <h3>${current.q}</h3>
-    <button onclick="answerQuiz(true)">Yes</button>
-    <button onclick="answerQuiz(false)">No</button>
+    <div class="card">
+      <h3>${current.q}</h3>
+      <br>
+      <button onclick="answerQuiz(true)">Yes</button>
+      <button onclick="answerQuiz(false)">No</button>
+    </div>
   `;
 }
 
@@ -163,30 +204,36 @@ function answerQuiz(ans) {
 }
 
 function showResult() {
-  quizBox.innerHTML = "<h3>Analyzing your answers...</h3>";
+  let bestField = Object.keys(answers).reduce((a, b) =>
+    answers[a] > answers[b] ? a : b
+  );
 
-  setTimeout(() => {
-    let bestField = Object.keys(answers).reduce((a, b) =>
-      answers[a] > answers[b] ? a : b
-    );
+  let suggestion = "";
 
-    let suggestion = "";
+  if (bestField === "tech") {
+    suggestion = "💻 Software Developer / AI Engineer";
+  } else if (bestField === "data") {
+    suggestion = "📊 Data Scientist";
+  } else if (bestField === "design") {
+    suggestion = "🎨 UI/UX Designer";
+  } else {
+    suggestion = "💼 Business / Finance";
+  }
 
-    if (bestField === "tech") {
-      suggestion = "💻 Software Developer / AI Engineer";
-    } else if (bestField === "data") {
-      suggestion = "📊 Data Scientist";
-    } else if (bestField === "design") {
-      suggestion = "🎨 UI/UX Designer";
-    } else {
-      suggestion = "💼 Business / Finance Roles";
-    }
+  quizBox.innerHTML = `
+    <div class="card">
+      <h2>🎯 Suggested Career</h2>
+      <br>
+      <strong>${suggestion}</strong>
+      <br><br>
+      <button onclick="restartQuiz()">🔄 Start Again</button>
+    </div>
+  `;
+}
 
-    quizBox.innerHTML = `
-      <div class="card">
-        🎯 Suggested Career:<br><br>
-        <strong>${suggestion}</strong>
-      </div>
-    `;
-  }, 1200);
+function restartQuiz() {
+  quizBox.innerHTML = `
+    <h2>🧠 Not sure? Answer a few questions</h2>
+    <button onclick="startQuiz()">Start Questions</button>
+  `;
 }
