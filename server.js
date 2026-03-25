@@ -10,37 +10,39 @@ const PORT = process.env.PORT || 3000;
 
 let visitors = 0;
 
-app.get("/api/data",(req,res)=>{
-  visitors++;
+const careerData = [
+  { role: "AI Engineer", salary: "₹12L - ₹30L", demand: "Very High" },
+  { role: "Software Developer", salary: "₹6L - ₹20L", demand: "High" },
+  { role: "Data Scientist", salary: "₹10L - ₹25L", demand: "Very High" },
+  { role: "Cybersecurity Analyst", salary: "₹8L - ₹18L", demand: "High" },
+  { role: "Cloud Engineer", salary: "₹10L - ₹22L", demand: "Very High" }
+];
 
+app.get("/api/data", (req, res) => {
+  visitors++;
   res.json({
     visitors,
-    growth: (Math.random()*10+5).toFixed(1),
-    demand: "High",
-    skills:["AI","Web Dev","Data Science","Cybersecurity","Cloud"],
-    salaries:[
-      {role:"AI Engineer",value:160},
-      {role:"Software Dev",value:130},
-      {role:"Data Scientist",value:150}
-    ]
+    skills: [
+      "AI/ML", "React", "Node.js", "Cloud", "Cybersecurity",
+      "Data Science", "Blockchain", "DevOps"
+    ],
+    careers: careerData
   });
 });
 
-app.post("/api/career",(req,res)=>{
-  const roles=[
-    "AI Engineer","Software Developer","Data Scientist",
-    "UI/UX Designer","Business Analyst"
-  ];
+app.post("/api/career", (req, res) => {
+  const { interest } = req.body;
 
-  const results=roles.map(r=>({
-    title:r,
-    confidence: Math.floor(Math.random()*30)+60
-  }));
+  let filtered = careerData.filter(c =>
+    c.role.toLowerCase().includes(interest.toLowerCase())
+  );
+
+  if (filtered.length === 0) filtered = careerData;
 
   res.json({
-    explanation:"Based on your answers, these careers suit you:",
-    topCareers: results.slice(0,3)
+    message: "Based on your interest:",
+    careers: filtered
   });
 });
 
-app.listen(PORT,()=>console.log("Server running"));
+app.listen(PORT, () => console.log("Server running"));
