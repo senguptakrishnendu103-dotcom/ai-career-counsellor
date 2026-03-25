@@ -11,54 +11,49 @@ const PORT = process.env.PORT || 3000;
 // ================= VISITOR =================
 let visitors = 0;
 
-// ================= DATA =================
+// ================= SKILLS =================
 const skills = [
   "AI/ML","React","Node.js","Cloud","Cybersecurity",
   "Data Science","Blockchain","DevOps","UI/UX","Finance"
 ];
 
+// ================= CAREER DATA =================
 const careerData = [
   {
     role: "AI Engineer",
     salary: "₹12L - ₹30L",
     demand: "Very High",
-    keywords: ["ai","ml","data","python","automation"]
+    keywords: ["ai","ml","data","python"]
   },
   {
     role: "Software Developer",
     salary: "₹6L - ₹20L",
     demand: "High",
-    keywords: ["coding","javascript","web","app","developer"]
+    keywords: ["coding","javascript","web"]
   },
   {
     role: "Data Scientist",
     salary: "₹10L - ₹25L",
     demand: "Very High",
-    keywords: ["data","analysis","statistics","machine learning"]
+    keywords: ["data","analysis","statistics"]
   },
   {
     role: "UI/UX Designer",
     salary: "₹5L - ₹15L",
     demand: "Medium",
-    keywords: ["design","ui","ux","creative","figma"]
+    keywords: ["design","ui","ux"]
   },
   {
     role: "Cybersecurity Analyst",
     salary: "₹8L - ₹18L",
     demand: "High",
-    keywords: ["security","hacking","network","cyber"]
+    keywords: ["security","cyber","hacking"]
   },
   {
     role: "Cloud Engineer",
     salary: "₹10L - ₹22L",
     demand: "Very High",
-    keywords: ["cloud","aws","azure","devops"]
-  },
-  {
-    role: "Business Analyst",
-    salary: "₹6L - ₹18L",
-    demand: "High",
-    keywords: ["business","analysis","management"]
+    keywords: ["cloud","aws","devops"]
   }
 ];
 
@@ -68,8 +63,7 @@ app.get("/api/data", (req, res) => {
 
   res.json({
     visitors,
-    skills,
-    careers: careerData
+    skills
   });
 });
 
@@ -79,174 +73,94 @@ app.post("/api/career", (req, res) => {
 
   let input = (interest || "").toLowerCase();
 
-  // 🔥 match based on keywords
   let results = careerData.filter(c =>
     c.keywords.some(k => input.includes(k))
   );
 
-  // if nothing matched → show top roles
   if (results.length === 0) {
     results = careerData.slice(0, 4);
   }
 
   res.json({
-    message: "Here are career suggestions based on your interest:",
+    message: "Career suggestions based on your interest:",
     careers: results
   });
 });
-// ================= LOAD DATA =================
-fetch("/api/data")
-.then(res => res.json())
-.then(data => {
-  document.getElementById("stats").innerText =
-    `👀 Visitors: ${data.visitors}`;
 
-  const skillsDiv = document.getElementById("skills");
-  skillsDiv.innerHTML = "";
+// ================= API: SKILL DETAILS =================
+app.post("/api/skill-details", (req, res) => {
+  const { skill } = req.body;
 
-  data.skills.forEach(skill => {
-    const span = document.createElement("span");
-    span.innerText = skill;
+  const data = {
+    "AI/ML": {
+      role: "AI Engineer",
+      roadmap: "Python → ML → Deep Learning → Projects",
+      skills: ["Python","TensorFlow","Math","Data"],
+      levels: "Junior → ML Engineer → AI Specialist",
+      salary: "₹12L–₹30L (India), $100k+",
+      demand: "Very High",
+      tip: "Build AI projects (chatbots, models)"
+    },
+    "React": {
+      role: "Frontend Developer",
+      roadmap: "HTML → CSS → JS → React",
+      skills: ["JS","React","UI"],
+      levels: "Junior → Frontend → Senior",
+      salary: "₹6L–₹18L",
+      demand: "High",
+      tip: "Build portfolio websites"
+    },
+    "Node.js": {
+      role: "Backend Developer",
+      roadmap: "JS → Node → APIs",
+      skills: ["Node","Express","DB"],
+      levels: "Backend → Fullstack",
+      salary: "₹7L–₹20L",
+      demand: "High",
+      tip: "Master APIs"
+    },
+    "Cybersecurity": {
+      role: "Security Analyst",
+      roadmap: "Networking → Security → Ethical Hacking",
+      skills: ["Linux","Networking"],
+      levels: "Analyst → Security Engineer",
+      salary: "₹8L–₹18L",
+      demand: "High",
+      tip: "Practice real hacking labs"
+    },
+    "Data Science": {
+      role: "Data Scientist",
+      roadmap: "Python → Stats → ML",
+      skills: ["Python","SQL","Stats"],
+      levels: "Analyst → Scientist",
+      salary: "₹10L–₹25L",
+      demand: "Very High",
+      tip: "Work on datasets"
+    }
+  };
 
-    // 🔥 CLICK EVENT
-    span.onclick = () => loadSkillDetails(skill);
+  const result = data[skill] || {
+    role: skill,
+    roadmap: "Learn basics + build projects",
+    skills: ["General Skills"],
+    levels: "Beginner → Advanced",
+    salary: "Varies",
+    demand: "Growing",
+    tip: "Stay consistent"
+  };
 
-    skillsDiv.appendChild(span);
-  });
+  res.json(result);
 });
 
-// ================= SKILL DETAILS =================
-function loadSkillDetails(skill){
-  fetch("/api/skill-details",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({skill})
-  })
-  .then(res=>res.json())
-  .then(showSkillDetails);
-}
+// ================= UPGRADE (SMART RESPONSE) =================
+// 🔥 More human-like explanation (bonus upgrade)
+app.post("/api/ai-advice", (req, res) => {
+  const { interest } = req.body;
 
-function showSkillDetails(data){
-  const results = document.getElementById("results");
+  let response = `Based on your interest in "${interest}", you can explore multiple career paths. Focus on building skills, real projects, and consistency.`;
 
-  results.innerHTML = `
-    <div class="card">
-      <h2>🚀 ${data.role}</h2>
-
-      <p><b>🛣️ Roadmap:</b> ${data.roadmap}</p>
-      <p><b>🧠 Skills:</b> ${data.skills.join(", ")}</p>
-      <p><b>💼 Career Path:</b> ${data.levels}</p>
-      <p><b>💰 Salary:</b> ${data.salary}</p>
-      <p><b>📈 Demand:</b> ${data.demand}</p>
-      <p><b>🔥 Tip:</b> ${data.tip}</p>
-    </div>
-  `;
-}
-
-// ================= CHAT SYSTEM =================
-function findCareer() {
-  const input = document.getElementById("interest").value.trim();
-
-  if (!input) {
-    alert("Enter interest first!");
-    return;
-  }
-
-  document.getElementById("quizBox").innerHTML = "";
-  document.getElementById("results").innerHTML = "";
-
-  fetch("/api/career", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({interest: input})
-  })
-  .then(res=>res.json())
-  .then(showResults);
-}
-
-// ================= QUIZ =================
-const questions = [
-  "Do you enjoy coding?",
-  "Are you interested in data?",
-  "Do you like design?",
-  "Interested in cybersecurity?"
-];
-
-let answers = [];
-let currentQ = 0;
-
-function startQuiz(){
-  answers = [];
-  currentQ = 0;
-
-  document.getElementById("quizBox").innerHTML = "";
-  document.getElementById("results").innerHTML = "";
-  document.getElementById("interest").value = "";
-
-  askQuestion();
-}
-
-function askQuestion(){
-  const box = document.getElementById("quizBox");
-
-  if(currentQ >= questions.length){
-    analyzeQuiz();
-    return;
-  }
-
-  box.innerHTML = `
-    <p>${questions[currentQ]}</p>
-    <button onclick="answer('yes')">Yes</button>
-    <button onclick="answer('no')">No</button>
-  `;
-}
-
-function answer(ans){
-  answers.push({q:questions[currentQ],a:ans});
-  currentQ++;
-  askQuestion();
-}
-
-function analyzeQuiz(){
-  let interest="";
-
-  answers.forEach(a=>{
-    if(a.q.includes("coding") && a.a==="yes") interest+=" coding";
-    if(a.q.includes("data") && a.a==="yes") interest+=" data";
-    if(a.q.includes("design") && a.a==="yes") interest+=" design";
-    if(a.q.includes("cyber") && a.a==="yes") interest+=" security";
-  });
-
-  fetch("/api/career",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({interest})
-  })
-  .then(res=>res.json())
-  .then(d=>{
-    document.getElementById("quizBox").innerHTML="";
-    showResults(d);
-  });
-}
-
-// ================= SHOW RESULTS =================
-function showResults(data){
-  const results = document.getElementById("results");
-  results.innerHTML = "";
-
-  data.careers.forEach(c=>{
-    const div=document.createElement("div");
-    div.className="card";
-
-    div.innerHTML = `
-      <h3>${c.role}</h3>
-      <p>💰 Salary: ${c.salary}</p>
-      <p>📈 Demand: ${c.demand}</p>
-    `;
-
-    results.appendChild(div);
-  });
-}
+  res.json({ advice: response });
+});
 
 // ================= SERVER =================
 app.listen(PORT, () => {
