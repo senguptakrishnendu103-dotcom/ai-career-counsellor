@@ -1,11 +1,17 @@
-/* ================= BODY ================= */
-body {
+/* ================= GLOBAL ================= */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: 'Segoe UI', sans-serif;
   color: #ffffff;
 
-  /* 🔥 DARK PREMIUM BG */
+  /* 🔥 Stylish Dark Gradient */
   background: radial-gradient(circle at top, #0f172a, #020617);
+  min-height: 100vh;
 }
 
 /* ================= PARTICLE BG ================= */
@@ -18,7 +24,7 @@ body {
   z-index: -1;
 }
 
-/* ================= MAIN CONTAINER ================= */
+/* ================= CONTAINER ================= */
 .container {
   max-width: 850px;
   margin: auto;
@@ -55,7 +61,7 @@ input {
 
   background: rgba(255,255,255,0.08);
   color: #ffffff;
-  caret-color: #ffffff; /* 🔥 cursor visible */
+  caret-color: #ffffff; /* 🔥 cursor fix */
 
   backdrop-filter: blur(8px);
 }
@@ -88,7 +94,7 @@ button:hover {
   margin-top: 10px;
 }
 
-/* 🔥 clickable fix */
+/* clickable skills */
 #skills span,
 .skills span {
   background: rgba(255,255,255,0.08);
@@ -103,7 +109,6 @@ button:hover {
   backdrop-filter: blur(6px);
 }
 
-/* hover */
 #skills span:hover,
 .skills span:hover {
   background: #3b82f6;
@@ -121,9 +126,11 @@ button:hover {
   box-shadow: 0 0 25px rgba(0,0,0,0.5);
 
   transition: 0.3s;
+
+  /* 🔥 for typing animation formatting */
+  white-space: pre-line;
 }
 
-/* hover card */
 .card:hover {
   transform: translateY(-5px);
 }
@@ -137,12 +144,28 @@ button:hover {
   margin: 6px;
 }
 
-/* ================= TEXT FIX ================= */
+/* ================= TEXT ================= */
 p {
   opacity: 0.9;
 }
 
-/* ================= SCROLL SMOOTH ================= */
+/* ================= SCROLL ================= */
 html {
   scroll-behavior: smooth;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.5s ease;
 }
