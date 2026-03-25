@@ -1,53 +1,33 @@
-body{
- margin:0;
- font-family:sans-serif;
- background:#020617;
- color:white;
- text-align:center;
-}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CareerAI Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-canvas{
- position:fixed;
- top:0;
- left:0;
- z-index:-1;
-}
+<canvas id="bg"></canvas>
 
-.container{
- max-width:800px;
- margin:auto;
- padding:20px;
-}
+<div class="container">
 
-#chatBox{
- background:#111;
- padding:10px;
- border-radius:10px;
- min-height:100px;
-}
+  <h1>🚀 CareerAI Pro</h1>
 
-.message{
- padding:8px;
- margin:5px;
- border-radius:8px;
-}
+  <div id="stats"></div>
 
-.ai{background:#222;}
-.user{background:#3b82f6;}
+  <h2>🔥 Top Skills</h2>
+  <div id="skills"></div>
 
-button{
- padding:10px;
- margin:10px;
- border:none;
- border-radius:10px;
- background:#3b82f6;
- color:white;
-}
+  <h2>🎯 Find Your Career</h2>
+  <input id="interest" placeholder="Enter interest (AI, coding, design...)">
+  <button onclick="findCareer()">Find Career</button>
 
-#skills span{
- background:#222;
- padding:5px 10px;
- margin:5px;
- display:inline-block;
- border-radius:8px;
-}
+  <div id="results"></div>
+
+</div>
+
+<script src="particles.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
