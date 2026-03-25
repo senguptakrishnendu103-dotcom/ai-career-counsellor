@@ -1,13 +1,12 @@
+/* ================= BODY ================= */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   color: white;
-
-  /* 🔥 DARK GRADIENT BACKGROUND */
   background: radial-gradient(circle at top, #0f172a, #020617);
 }
 
-/* 🌌 CANVAS BACKGROUND */
+/* ================= BACKGROUND CANVAS ================= */
 #bg {
   position: fixed;
   top: 0;
@@ -17,7 +16,7 @@ body {
   z-index: -1;
 }
 
-/* MAIN CONTAINER (KEEP ALIGNMENT SAME) */
+/* ================= CONTAINER ================= */
 .container {
   max-width: 800px;
   margin: auto;
@@ -25,22 +24,37 @@ body {
   text-align: center;
 }
 
-/* TITLE */
+/* ================= HEADINGS ================= */
 h1 {
   font-size: 32px;
   margin-bottom: 10px;
 }
 
-/* INPUT */
+h2 {
+  margin-top: 30px;
+}
+
+/* ================= INPUT ================= */
 input {
   padding: 12px;
   border-radius: 10px;
   border: none;
   margin: 10px;
   width: 70%;
+  outline: none;
+
+  background: rgba(255,255,255,0.1);
+  color: white;
+  caret-color: white; /* 🔥 FIX CURSOR */
+  backdrop-filter: blur(6px);
 }
 
-/* BUTTON */
+/* Placeholder */
+input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+/* ================= BUTTON ================= */
 button {
   padding: 12px 18px;
   border-radius: 10px;
@@ -49,24 +63,59 @@ button {
   color: white;
   cursor: pointer;
   box-shadow: 0 0 15px rgba(59,130,246,0.4);
+  transition: 0.3s;
 }
 
-/* SKILLS */
+button:hover {
+  transform: scale(1.05);
+}
+
+/* ================= SKILLS ================= */
 #skills span {
   background: rgba(255,255,255,0.08);
   padding: 8px 12px;
   margin: 5px;
   display: inline-block;
   border-radius: 10px;
+
+  cursor: pointer;
+  transition: 0.3s;
   backdrop-filter: blur(6px);
 }
 
-/* RESULT CARDS */
+#skills span:hover {
+  background: #3b82f6;
+  transform: scale(1.05);
+}
+
+/* ================= RESULT CARDS ================= */
 .card {
   background: rgba(255,255,255,0.06);
-  padding: 15px;
-  margin: 15px;
-  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 15px;
+
   backdrop-filter: blur(10px);
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ================= QUIZ BOX ================= */
+#quizBox {
+  margin-top: 20px;
+}
+
+#quizBox button {
+  margin: 5px;
+}
+
+/* ================= STATS ================= */
+#stats {
+  margin-bottom: 15px;
+  font-size: 14px;
+  opacity: 0.8;
 }
