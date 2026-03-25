@@ -23,145 +23,184 @@ const careerData = [
     role: "AI Engineer",
     salary: "₹12L - ₹30L",
     demand: "Very High",
-    keywords: ["ai","ml","data","python"]
+    keywords: ["ai","ml","data"]
   },
   {
     role: "Software Developer",
     salary: "₹6L - ₹20L",
     demand: "High",
-    keywords: ["coding","javascript","web"]
+    keywords: ["coding","javascript"]
   },
   {
     role: "Data Scientist",
     salary: "₹10L - ₹25L",
     demand: "Very High",
-    keywords: ["data","analysis","statistics"]
+    keywords: ["data","analysis"]
   },
   {
     role: "UI/UX Designer",
     salary: "₹5L - ₹15L",
     demand: "Medium",
-    keywords: ["design","ui","ux"]
+    keywords: ["design","ui"]
   },
   {
     role: "Cybersecurity Analyst",
     salary: "₹8L - ₹18L",
     demand: "High",
-    keywords: ["security","cyber","hacking"]
+    keywords: ["security","cyber"]
   },
   {
     role: "Cloud Engineer",
-    salary: "₹10L - ₹22L",
+    salary: "₹10L - ₹25L",
     demand: "Very High",
-    keywords: ["cloud","aws","devops"]
+    keywords: ["cloud","aws"]
   }
 ];
 
-// ================= API: DASHBOARD =================
+// ================= SKILL DETAILS =================
+const skillDetails = {
+  "AI/ML": {
+    role: "AI Engineer",
+    roadmap: "Python → ML → Deep Learning → NLP → Projects",
+    skills: ["Python","TensorFlow","PyTorch","Math"],
+    levels: "Junior → ML Engineer → AI Architect",
+    salary: "₹12L–₹30L",
+    demand: "Very High",
+    tip: "Build AI apps"
+  },
+
+  "React": {
+    role: "Frontend Developer",
+    roadmap: "HTML → CSS → JS → React",
+    skills: ["JavaScript","React","Redux"],
+    levels: "Junior → Senior Dev",
+    salary: "₹6L–₹18L",
+    demand: "High",
+    tip: "Build UI projects"
+  },
+
+  "Node.js": {
+    role: "Backend Developer",
+    roadmap: "JS → Node → APIs → DB",
+    skills: ["Node","Express","MongoDB"],
+    levels: "Backend → Fullstack",
+    salary: "₹7L–₹20L",
+    demand: "High",
+    tip: "Build APIs"
+  },
+
+  "Cloud": {
+    role: "Cloud Engineer",
+    roadmap: "Networking → AWS → Docker → Kubernetes",
+    skills: ["AWS","Docker","Linux"],
+    levels: "Engineer → Architect",
+    salary: "₹10L–₹28L",
+    demand: "Very High",
+    tip: "Get AWS cert"
+  },
+
+  "Cybersecurity": {
+    role: "Security Analyst",
+    roadmap: "Networking → Security → Ethical Hacking",
+    skills: ["Linux","Networking","Kali"],
+    levels: "Analyst → Hacker",
+    salary: "₹8L–₹18L",
+    demand: "High",
+    tip: "Practice labs"
+  },
+
+  "Data Science": {
+    role: "Data Scientist",
+    roadmap: "Python → Stats → ML",
+    skills: ["Python","Pandas","SQL"],
+    levels: "Analyst → Scientist",
+    salary: "₹10L–₹25L",
+    demand: "Very High",
+    tip: "Kaggle projects"
+  },
+
+  "Blockchain": {
+    role: "Blockchain Developer",
+    roadmap: "JS → Solidity → Web3",
+    skills: ["Solidity","Ethereum"],
+    levels: "Dev → Architect",
+    salary: "₹12L–₹35L",
+    demand: "Growing",
+    tip: "Build smart contracts"
+  },
+
+  "DevOps": {
+    role: "DevOps Engineer",
+    roadmap: "Linux → Git → CI/CD → Docker",
+    skills: ["Docker","Kubernetes"],
+    levels: "Engineer → Platform Engineer",
+    salary: "₹10L–₹30L",
+    demand: "Very High",
+    tip: "Automate pipelines"
+  },
+
+  "UI/UX": {
+    role: "UI/UX Designer",
+    roadmap: "Design → Figma → UX Research",
+    skills: ["Figma","Adobe XD"],
+    levels: "Designer → Lead",
+    salary: "₹5L–₹15L",
+    demand: "Medium",
+    tip: "Design apps"
+  },
+
+  "Finance": {
+    role: "Financial Analyst",
+    roadmap: "Accounting → Excel → Finance Modeling",
+    skills: ["Excel","Finance","Analysis"],
+    levels: "Analyst → Investment Banker",
+    salary: "₹6L–₹20L",
+    demand: "High",
+    tip: "Learn stock market"
+  }
+};
+
+// ================= ROUTES =================
 app.get("/api/data", (req, res) => {
   visitors++;
-
-  res.json({
-    visitors,
-    skills
-  });
+  res.json({ visitors, skills });
 });
 
-// ================= API: CAREER =================
 app.post("/api/career", (req, res) => {
-  const { interest } = req.body;
-
-  let input = (interest || "").toLowerCase();
+  const input = req.body.interest?.toLowerCase() || "";
 
   let results = careerData.filter(c =>
     c.keywords.some(k => input.includes(k))
   );
 
-  if (results.length === 0) {
-    results = careerData.slice(0, 4);
-  }
+  if (results.length === 0) results = careerData;
 
-  res.json({
-    message: "Career suggestions based on your interest:",
-    careers: results
-  });
+  res.json({ careers: results });
 });
 
-// ================= API: SKILL DETAILS =================
 app.post("/api/skill-details", (req, res) => {
   const { skill } = req.body;
 
-  const data = {
-    "AI/ML": {
-      role: "AI Engineer",
-      roadmap: "Python → ML → Deep Learning → Projects",
-      skills: ["Python","TensorFlow","Math","Data"],
-      levels: "Junior → ML Engineer → AI Specialist",
-      salary: "₹12L–₹30L (India), $100k+",
-      demand: "Very High",
-      tip: "Build AI projects (chatbots, models)"
-    },
-    "React": {
-      role: "Frontend Developer",
-      roadmap: "HTML → CSS → JS → React",
-      skills: ["JS","React","UI"],
-      levels: "Junior → Frontend → Senior",
-      salary: "₹6L–₹18L",
-      demand: "High",
-      tip: "Build portfolio websites"
-    },
-    "Node.js": {
-      role: "Backend Developer",
-      roadmap: "JS → Node → APIs",
-      skills: ["Node","Express","DB"],
-      levels: "Backend → Fullstack",
-      salary: "₹7L–₹20L",
-      demand: "High",
-      tip: "Master APIs"
-    },
-    "Cybersecurity": {
-      role: "Security Analyst",
-      roadmap: "Networking → Security → Ethical Hacking",
-      skills: ["Linux","Networking"],
-      levels: "Analyst → Security Engineer",
-      salary: "₹8L–₹18L",
-      demand: "High",
-      tip: "Practice real hacking labs"
-    },
-    "Data Science": {
-      role: "Data Scientist",
-      roadmap: "Python → Stats → ML",
-      skills: ["Python","SQL","Stats"],
-      levels: "Analyst → Scientist",
-      salary: "₹10L–₹25L",
-      demand: "Very High",
-      tip: "Work on datasets"
-    }
-  };
+  const result = skillDetails[skill];
 
-  const result = data[skill] || {
-    role: skill,
-    roadmap: "Learn basics + build projects",
-    skills: ["General Skills"],
-    levels: "Beginner → Advanced",
-    salary: "Varies",
-    demand: "Growing",
-    tip: "Stay consistent"
-  };
+  if (!result) {
+    return res.json({
+      role: skill,
+      roadmap: "Learn basics + build projects",
+      skills: ["General Skills"],
+      levels: "Beginner → Advanced",
+      salary: "Varies",
+      demand: "Growing",
+      tip: "Stay consistent"
+    });
+  }
 
   res.json(result);
 });
 
-// ================= UPGRADE (SMART RESPONSE) =================
-// 🔥 More human-like explanation (bonus upgrade)
-app.post("/api/ai-advice", (req, res) => {
-  const { interest } = req.body;
-
-  let response = `Based on your interest in "${interest}", you can explore multiple career paths. Focus on building skills, real projects, and consistency.`;
-
-  res.json({ advice: response });
+app.listen(PORT, () => {
+  console.log("🚀 Server running on port " + PORT);
 });
-
 // ================= SERVER =================
 app.listen(PORT, () => {
   console.log("🚀 Server running on port " + PORT);
