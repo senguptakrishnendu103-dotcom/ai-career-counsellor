@@ -1,52 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>CareerAI Pro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 
-<div class="container">
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1>Your AI Career Coach for Professional Success</h1>
-    <p>Get insights, trends, and personalized career guidance</p>
-    <button onclick="startChat()">Get Started</button>
-  </section>
+let particles = [];
 
-  <!-- INSIGHTS -->
-  <section class="cards">
-    <div class="card" id="growth"></div>
-    <div class="card" id="demand"></div>
-    <div class="card" id="visitors"></div>
-  </section>
+for(let i=0;i<80;i++){
+ particles.push({
+  x:Math.random()*canvas.width,
+  y:Math.random()*canvas.height,
+  r:Math.random()*2,
+  dx:Math.random()-0.5,
+  dy:Math.random()-0.5
+ });
+}
 
-  <!-- SKILLS -->
-  <section>
-    <h2>🔥 Top Skills</h2>
-    <div id="skills" class="skills"></div>
-  </section>
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  <!-- SALARY CHART -->
-  <section>
-    <h2>💰 Salary Insights</h2>
-    <canvas id="chart" width="400" height="200"></canvas>
-  </section>
+ particles.forEach(p=>{
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+  ctx.fillStyle="#3b82f6";
+  ctx.fill();
 
-  <!-- CHAT -->
-  <section>
-    <h2>🤖 AI Career Assistant</h2>
-    <div id="chatBox"></div>
-  </section>
+  p.x+=p.dx;
+  p.y+=p.dy;
+ });
 
-</div>
+ requestAnimationFrame(draw);
+}
 
-<script src="script.js"></script>
-</body>
-</html>
-<script src="script.js"></script>
-
-</body>
-</html>
+draw();
