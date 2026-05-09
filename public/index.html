@@ -2,64 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CareerAI Pro</title>
+  <title>CareerAI Pro | AI Powered Guidance</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta name="description" content="Discover your perfect career path with AI-driven insights." />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
   <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
-
 <body>
 
-  <!-- Background Canvas -->
-  <canvas id="bg"></canvas>
+  <!-- Animated Background Elements -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
 
-  <div class="container">
+  <div class="container glass-panel">
+    <header>
+      <h1><span class="gradient-text">CareerAI</span> Pro</h1>
+      <p class="subtitle">Discover your true potential using the power of Google Gemini.</p>
+      <div id="stats" class="badge">👀 Visitors: Loading...</div>
+    </header>
 
-    <!-- TITLE -->
-    <h1>🚀 CareerAI Pro</h1>
+    <main>
+      <!-- Option Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-search" onclick="switchTab('search')">Search Interest</button>
+        <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">Take AI Quiz</button>
+        <button class="tab-btn" id="tab-resume" onclick="switchTab('resume')">Upload Resume 📄</button>
+      </div>
 
-    <!-- STATS -->
-    <div id="stats">👀 Visitors: Loading...</div>
+      <!-- Search View -->
+      <section id="view-search" class="view-section active">
+        <div class="input-group">
+          <input
+            id="interest"
+            type="text"
+            placeholder="E.g. I like coding and artificial intelligence..."
+          />
+          <button onclick="getCareer()" class="btn-primary">
+            Analyze <span class="icon">✨</span>
+          </button>
+        </div>
+        <div class="quick-tags">
+          <span class="tags-label">Trending:</span>
+          <button class="tag" onclick="quickSearch('AI/ML')">AI/ML</button>
+          <button class="tag" onclick="quickSearch('Cloud Architecture')">Cloud</button>
+          <button class="tag" onclick="quickSearch('Data Science')">Data</button>
+          <button class="tag" onclick="quickSearch('Cybersecurity')">Cybersecurity</button>
+        </div>
+      </section>
 
-    <!-- SKILLS -->
-    <h2>🔥 Top Skills (Trending)</h2>
+      <!-- Quiz View -->
+      <section id="view-quiz" class="view-section hidden">
+        <div id="quizBox" class="quiz-container">
+          <h3>Not sure what to do?</h3>
+          <p>Let our AI evaluate your profile through 4 quick questions.</p>
+          <button onclick="startQuiz()" class="btn-secondary">Start Assessment 🚀</button>
+        </div>
+      </section>
 
-    <div id="skills">
-      <span onclick="getSkillDetails('AI/ML')">AI/ML</span>
-      <span onclick="getSkillDetails('React')">React</span>
-      <span onclick="getSkillDetails('Node.js')">Node.js</span>
-      <span onclick="getSkillDetails('Cloud')">Cloud</span>
-      <span onclick="getSkillDetails('Cybersecurity')">Cybersecurity</span>
-      <span onclick="getSkillDetails('Data Science')">Data Science</span>
-      <span onclick="getSkillDetails('Blockchain')">Blockchain</span>
-      <span onclick="getSkillDetails('DevOps')">DevOps</span>
-      <span onclick="getSkillDetails('UI/UX')">UI/UX</span>
-      <span onclick="getSkillDetails('Finance')">Finance</span>
-    </div>
+      <!-- Resume Upload View -->
+      <section id="view-resume" class="view-section hidden">
+        <div class="upload-container">
+          <h3>Analyze My Resume</h3>
+          <p>Upload your PDF resume and let Gemini find your perfect role.</p>
+          <div class="file-upload-wrapper">
+            <input type="file" id="resumeUpload" accept=".pdf" />
+            <label for="resumeUpload" class="file-upload-label">
+              <span class="icon">📄</span> Choose PDF File
+            </label>
+          </div>
+          <p id="fileNameDisplay" style="margin-top:10px; color:var(--primary); font-size: 0.9rem;"></p>
+          <button onclick="uploadResume()" class="btn-primary" style="margin: 20px auto 0;" id="uploadBtn" disabled>
+            Analyze Resume <span class="icon">✨</span>
+          </button>
+        </div>
+      </section>
 
-    <!-- SEARCH -->
-    <h2>🎯 Find Your Career Path</h2>
-
-    <input
-      id="interest"
-      placeholder="Enter your interest (AI, coding, design, business...)"
-    />
-    <button onclick="getCareer()">Find Career</button>
-
-    <!-- QUIZ -->
-    <div id="quizBox">
-      <h2>🧠 Not sure? Answer a few questions</h2>
-      <button onclick="startQuiz()">Start Questions</button>
-    </div>
-
-    <!-- RESULT -->
-    <div id="result"></div>
-
+      <!-- Result Area -->
+      <section id="resultArea" class="hidden">
+         <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p class="loading-text">Gemini is analyzing your profile...</p>
+         </div>
+         <div id="resultContent"></div>
+      </section>
+    </main>
   </div>
 
-  <!-- SCRIPT -->
-  <script src="script.js"></script>
-
+  <script src="script.js?v=3"></script>
 </body>
 </html>

@@ -1,5 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const multer = require("multer");
+const pdfParse = require("pdf-parse");
 
 const app = express();
 app.use(cors());
@@ -8,200 +12,109 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
+
+// Configure Multer for in-memory file upload
+const upload = multer({ storage: multer.memoryStorage() });
+
 // ================= VISITOR =================
 let visitors = 0;
-
-// ================= SKILLS =================
-const skills = [
-  "AI/ML","React","Node.js","Cloud","Cybersecurity",
-  "Data Science","Blockchain","DevOps","UI/UX","Finance"
-];
-
-// ================= CAREER DATA =================
-const careerData = [
-  {
-    role: "AI Engineer",
-    salary: "₹12L - ₹30L",
-    demand: "Very High",
-    keywords: ["ai","ml","data"]
-  },
-  {
-    role: "Software Developer",
-    salary: "₹6L - ₹20L",
-    demand: "High",
-    keywords: ["coding","javascript"]
-  },
-  {
-    role: "Data Scientist",
-    salary: "₹10L - ₹25L",
-    demand: "Very High",
-    keywords: ["data","analysis"]
-  },
-  {
-    role: "UI/UX Designer",
-    salary: "₹5L - ₹15L",
-    demand: "Medium",
-    keywords: ["design","ui"]
-  },
-  {
-    role: "Cybersecurity Analyst",
-    salary: "₹8L - ₹18L",
-    demand: "High",
-    keywords: ["security","cyber"]
-  },
-  {
-    role: "Cloud Engineer",
-    salary: "₹10L - ₹25L",
-    demand: "Very High",
-    keywords: ["cloud","aws"]
-  }
-];
-
-// ================= SKILL DETAILS =================
-const skillDetails = {
-  "AI/ML": {
-    role: "AI Engineer",
-    roadmap: "Python → ML → Deep Learning → NLP → Projects",
-    skills: ["Python","TensorFlow","PyTorch","Math"],
-    levels: "Junior → ML Engineer → AI Architect",
-    salary: "₹12L–₹30L",
-    demand: "Very High",
-    tip: "Build AI apps"
-  },
-
-  "React": {
-    role: "Frontend Developer",
-    roadmap: "HTML → CSS → JS → React",
-    skills: ["JavaScript","React","Redux"],
-    levels: "Junior → Senior Dev",
-    salary: "₹6L–₹18L",
-    demand: "High",
-    tip: "Build UI projects"
-  },
-
-  "Node.js": {
-    role: "Backend Developer",
-    roadmap: "JS → Node → APIs → DB",
-    skills: ["Node","Express","MongoDB"],
-    levels: "Backend → Fullstack",
-    salary: "₹7L–₹20L",
-    demand: "High",
-    tip: "Build APIs"
-  },
-
-  "Cloud": {
-    role: "Cloud Engineer",
-    roadmap: "Networking → AWS → Docker → Kubernetes",
-    skills: ["AWS","Docker","Linux"],
-    levels: "Engineer → Architect",
-    salary: "₹10L–₹28L",
-    demand: "Very High",
-    tip: "Get AWS cert"
-  },
-
-  "Cybersecurity": {
-    role: "Security Analyst",
-    roadmap: "Networking → Security → Ethical Hacking",
-    skills: ["Linux","Networking","Kali"],
-    levels: "Analyst → Hacker",
-    salary: "₹8L–₹18L",
-    demand: "High",
-    tip: "Practice labs"
-  },
-
-  "Data Science": {
-    role: "Data Scientist",
-    roadmap: "Python → Stats → ML",
-    skills: ["Python","Pandas","SQL"],
-    levels: "Analyst → Scientist",
-    salary: "₹10L–₹25L",
-    demand: "Very High",
-    tip: "Kaggle projects"
-  },
-
-  "Blockchain": {
-    role: "Blockchain Developer",
-    roadmap: "JS → Solidity → Web3",
-    skills: ["Solidity","Ethereum"],
-    levels: "Dev → Architect",
-    salary: "₹12L–₹35L",
-    demand: "Growing",
-    tip: "Build smart contracts"
-  },
-
-  "DevOps": {
-    role: "DevOps Engineer",
-    roadmap: "Linux → Git → CI/CD → Docker",
-    skills: ["Docker","Kubernetes"],
-    levels: "Engineer → Platform Engineer",
-    salary: "₹10L–₹30L",
-    demand: "Very High",
-    tip: "Automate pipelines"
-  },
-
-  "UI/UX": {
-    role: "UI/UX Designer",
-    roadmap: "Design → Figma → UX Research",
-    skills: ["Figma","Adobe XD"],
-    levels: "Designer → Lead",
-    salary: "₹5L–₹15L",
-    demand: "Medium",
-    tip: "Design apps"
-  },
-
-  "Finance": {
-    role: "Financial Analyst",
-    roadmap: "Accounting → Excel → Finance Modeling",
-    skills: ["Excel","Finance","Analysis"],
-    levels: "Analyst → Investment Banker",
-    salary: "₹6L–₹20L",
-    demand: "High",
-    tip: "Learn stock market"
-  }
-};
 
 // ================= ROUTES =================
 app.get("/api/data", (req, res) => {
   visitors++;
-  res.json({ visitors, skills });
+  res.json({ visitors });
 });
 
-app.post("/api/career", (req, res) => {
-  const input = req.body.interest?.toLowerCase() || "";
+app.post("/api/counsel", async (req, res) => {
+  try {
+    const { interest, answers } = req.body;
+    let prompt = "";
 
-  let results = careerData.filter(c =>
-    c.keywords.some(k => input.includes(k))
-  );
+    if (answers) {
+       prompt = `I have taken a career quiz. My tech interest score is ${answers.tech}, data score is ${answers.data}, design score is ${answers.design}, business score is ${answers.business}. Based on this, suggest ONE best fitting modern career role. Provide the response as a JSON object with the following keys:
+       "role" (string, the career title),
+       "roadmap" (string, high-level path to learn),
+       "skills" (array of strings, top 4-5 skills),
+       "levels" (string, career progression e.g., Junior -> Senior),
+       "salary" (string, realistic expected salary range in India, e.g., ₹8L-₹20L),
+       "demand" (string, e.g., High, Very High),
+       "tip" (string, one actionable tip).
+       Do not include markdown blocks, just pure JSON.`;
+    } else if (interest) {
+       prompt = `I am interested in ${interest}. Suggest the best fitting modern career role for this. Provide the response as a JSON object with the following keys:
+       "role" (string, the career title),
+       "roadmap" (string, high-level path to learn),
+       "skills" (array of strings, top 4-5 skills),
+       "levels" (string, career progression e.g., Junior -> Senior),
+       "salary" (string, realistic expected salary range in India, e.g., ₹8L-₹20L),
+       "demand" (string, e.g., High, Very High),
+       "tip" (string, one actionable tip).
+       Do not include markdown blocks, just pure JSON.`;
+    } else {
+       return res.status(400).json({ error: "No input provided" });
+    }
 
-  if (results.length === 0) results = careerData;
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const result = await model.generateContent(prompt);
+    let text = result.response.text().trim();
+    
+    // Strip markdown formatting if Gemini returned it
+    if (text.startsWith("```json")) {
+        text = text.replace(/^```json/, "").replace(/```$/, "").trim();
+    } else if (text.startsWith("```")) {
+        text = text.replace(/^```/, "").replace(/```$/, "").trim();
+    }
 
-  res.json({ careers: results });
-});
+    const aiData = JSON.parse(text);
+    res.json(aiData);
 
-app.post("/api/skill-details", (req, res) => {
-  const { skill } = req.body;
-
-  const result = skillDetails[skill];
-
-  if (!result) {
-    return res.json({
-      role: skill,
-      roadmap: "Learn basics + build projects",
-      skills: ["General Skills"],
-      levels: "Beginner → Advanced",
-      salary: "Varies",
-      demand: "Growing",
-      tip: "Stay consistent"
-    });
+  } catch (error) {
+    console.error("AI Error:", error);
+    res.status(500).json({ error: "Failed to generate AI response. Please check API key." });
   }
-
-  res.json(result);
 });
 
-app.listen(PORT, () => {
-  console.log("🚀 Server running on port " + PORT);
+app.post("/api/upload-resume", upload.single("resume"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No PDF file uploaded" });
+    }
+
+    const data = await pdfParse(req.file.buffer);
+    const resumeText = data.text;
+
+    const prompt = `I am providing my extracted resume text. Analyze my skills, experience, and projects. Based strictly on this, suggest ONE best fitting modern career role. Here is the resume text:
+    ---
+    ${resumeText.substring(0, 3000)} // Limiting to 3000 chars to save context
+    ---
+    Provide the response as a JSON object with the following keys:
+    "role" (string, the career title),
+    "roadmap" (string, high-level path to learn/improve),
+    "skills" (array of strings, top 4-5 skills I have or need),
+    "levels" (string, career progression e.g., Junior -> Senior),
+    "salary" (string, realistic expected salary range in India, e.g., ₹8L-₹20L),
+    "demand" (string, e.g., High, Very High),
+    "tip" (string, one actionable tip).
+    Do not include markdown blocks, just pure JSON.`;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const result = await model.generateContent(prompt);
+    let text = result.response.text().trim();
+    
+    if (text.startsWith("\`\`\`json")) text = text.replace(/^\`\`\`json/, "").replace(/\`\`\`$/, "").trim();
+    else if (text.startsWith("\`\`\`")) text = text.replace(/^\`\`\`/, "").replace(/\`\`\`$/, "").trim();
+
+    const aiData = JSON.parse(text);
+    res.json(aiData);
+
+  } catch (error) {
+    console.error("Resume Parsing Error:", error);
+    res.status(500).json({ error: "Failed to parse resume or generate response." });
+  }
 });
-// ================= SERVER =================
+
 app.listen(PORT, () => {
   console.log("🚀 Server running on port " + PORT);
 });

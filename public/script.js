@@ -1,48 +1,18 @@
+/* public/script.js */
 // ================= ELEMENTS =================
-const resultBox = document.getElementById("result");
-const quizBox = document.getElementById("quizBox");
+const viewSearch = document.getElementById("view-search");
+const viewQuiz = document.getElementById("view-quiz");
+const viewResume = document.getElementById("view-resume");
+const resultArea = document.getElementById("resultArea");
+const resultContent = document.getElementById("resultContent");
+const loadingIndicator = document.getElementById("loading");
 const statsBox = document.getElementById("stats");
+const interestInput = document.getElementById("interest");
+const resumeUpload = document.getElementById("resumeUpload");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileNameDisplay = document.getElementById("fileNameDisplay");
 
-// ================= BACKGROUND =================
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-
-for (let i = 0; i < 80; i++) {
-  particles.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 2,
-    dx: Math.random() - 0.5,
-    dy: Math.random() - 0.5
-  });
-}
-
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  particles.forEach(p => {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = "#3b82f6";
-    ctx.fill();
-
-    p.x += p.dx;
-    p.y += p.dy;
-
-    if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-  });
-
-  requestAnimationFrame(animate);
-}
-animate();
-
-// ================= VISITOR =================
+// ================= INITIALIZATION =================
 async function loadStats() {
   try {
     const res = await fetch("/api/data");
@@ -54,170 +24,232 @@ async function loadStats() {
 }
 loadStats();
 
-// ================= TYPE EFFECT =================
-function typeText(el, text) {
-  el.innerHTML = "";
-  let i = 0;
+// ================= UI NAVIGATION =================
+function switchTab(tabId) {
+  // Update buttons
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.getElementById(`tab-${tabId}`).classList.add("active");
 
-  function typing() {
-    if (i < text.length) {
-      el.innerHTML += text[i];
-      i++;
-      setTimeout(typing, 10);
-    }
+  // Update views
+  document.querySelectorAll(".view-section").forEach(view => view.classList.remove("active", "hidden"));
+  if (tabId === 'search') {
+    viewSearch.classList.add("active");
+    viewQuiz.classList.add("hidden");
+    viewResume.classList.add("hidden");
+  } else if (tabId === 'quiz') {
+    viewSearch.classList.add("hidden");
+    viewQuiz.classList.add("active");
+    viewResume.classList.add("hidden");
+  } else if (tabId === 'resume') {
+    viewSearch.classList.add("hidden");
+    viewQuiz.classList.add("hidden");
+    viewResume.classList.add("active");
   }
-
-  typing();
+  
+  resultArea.classList.add("hidden");
 }
 
-// ================= CAREER SEARCH =================
-async function getCareer() {
-  const input = document.getElementById("interest").value;
+function quickSearch(term) {
+  interestInput.value = term;
+  getCareer();
+}
+
+// ================= AI COMMUNICATION =================
+async function fetchAIResponse(payload) {
+  resultArea.classList.remove("hidden");
+  loadingIndicator.classList.remove("hidden");
+  resultContent.innerHTML = "";
+
+  try {
+    const res = await fetch("/api/counsel", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    
+    if (res.ok) {
+      renderResult(data);
+    } else {
+      renderError(data.error || "An error occurred.");
+    }
+  } catch (err) {
+    renderError("Failed to connect to the server.");
+  } finally {
+    loadingIndicator.classList.add("hidden");
+  }
+}
+
+// ================= RESUME UPLOAD FLOW =================
+resumeUpload.addEventListener("change", function() {
+  if (this.files && this.files.length > 0) {
+    fileNameDisplay.innerText = "Selected: " + this.files[0].name;
+    uploadBtn.disabled = false;
+  } else {
+    fileNameDisplay.innerText = "";
+    uploadBtn.disabled = true;
+  }
+});
+
+async function uploadResume() {
+  const file = resumeUpload.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("resume", file);
+
+  resultArea.classList.remove("hidden");
+  loadingIndicator.classList.remove("hidden");
+  resultContent.innerHTML = "";
+
+  try {
+    const res = await fetch("/api/upload-resume", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    
+    if (res.ok) {
+      renderResult(data);
+    } else {
+      renderError(data.error || "An error occurred.");
+    }
+  } catch (err) {
+    renderError("Failed to parse resume.");
+  } finally {
+    loadingIndicator.classList.add("hidden");
+  }
+}
+
+// ================= SEARCH FLOW =================
+function getCareer() {
+  const input = interestInput.value.trim();
   if (!input) return;
-
-  resultBox.innerHTML = `<div class="card">🤖 Thinking...</div>`;
-
-  const res = await fetch("/api/career", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({interest: input})
-  });
-
-  const data = await res.json();
-  resultBox.innerHTML = "";
-
-  data.careers.forEach(c => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const text = `
-🚀 ${c.role}
-
-💰 Salary: ${c.salary}
-📊 Demand: ${c.demand}
-    `;
-
-    resultBox.appendChild(card);
-    typeText(card, text);
-  });
+  fetchAIResponse({ interest: input });
 }
 
-// ================= SKILL CLICK =================
-async function getSkillDetails(skill) {
-  resultBox.innerHTML = `<div class="card">🤖 Loading...</div>`;
+interestInput.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    getCareer();
+  }
+});
 
-  const res = await fetch("/api/skill-details", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({skill})
-  });
-
-  const data = await res.json();
-  resultBox.innerHTML = "";
-
-  const card = document.createElement("div");
-  card.className = "card";
-
-  const text = `
-🚀 ${data.role}
-
-🗺 Roadmap: ${data.roadmap}
-🧠 Skills: ${data.skills.join(", ")}
-
-📈 Career Path: ${data.levels}
-💰 Salary: ${data.salary}
-📊 Demand: ${data.demand}
-
-🔥 Tip: ${data.tip}
-  `;
-
-  resultBox.appendChild(card);
-  typeText(card, text);
-}
-
-// ================= QUIZ =================
-let quizIndex = 0;
-
+// ================= QUIZ FLOW =================
 const questions = [
-  { q: "Do you enjoy coding?", field: "tech" },
-  { q: "Do you like analyzing data?", field: "data" },
-  { q: "Are you creative?", field: "design" },
-  { q: "Do you like business?", field: "business" }
+  { q: "How much do you enjoy problem-solving and coding logic?", field: "tech" },
+  { q: "Do you like analyzing numbers, patterns, or datasets?", field: "data" },
+  { q: "Are you passionate about visual aesthetics and user experience?", field: "design" },
+  { q: "Do you prefer strategic planning, management, and business growth?", field: "business" }
 ];
 
-let answers = {
-  tech: 0,
-  data: 0,
-  design: 0,
-  business: 0
-};
+let quizIndex = 0;
+let answers = { tech: 0, data: 0, design: 0, business: 0 };
 
 function startQuiz() {
   quizIndex = 0;
   answers = { tech: 0, data: 0, design: 0, business: 0 };
-
-  resultBox.innerHTML = ""; // clear old cards
   showQuestion();
 }
 
 function showQuestion() {
   if (quizIndex >= questions.length) {
-    showResult();
+    finishQuiz();
     return;
   }
 
   const q = questions[quizIndex];
-
+  const quizBox = document.getElementById("quizBox");
+  
   quizBox.innerHTML = `
-    <div class="card">
-      <h3>${q.q}</h3><br>
-      <button onclick="answerQuiz(true)">Yes</button>
-      <button onclick="answerQuiz(false)">No</button>
+    <h3>Question ${quizIndex + 1} of ${questions.length}</h3>
+    <p style="font-size: 1.2rem; margin: 20px 0;">${q.q}</p>
+    <div class="quiz-answers">
+      <button onclick="answerQuiz(10)" class="btn-primary">Absolutely! 😍</button>
+      <button onclick="answerQuiz(5)" class="btn-secondary">It's okay 🤔</button>
+      <button onclick="answerQuiz(0)" class="btn-secondary" style="border-color: rgba(255,0,0,0.3)">Not really 🙅‍♂️</button>
     </div>
   `;
 }
 
-function answerQuiz(ans) {
-  if (ans) {
-    answers[questions[quizIndex].field]++;
-  }
-
+function answerQuiz(score) {
+  answers[questions[quizIndex].field] += score;
   quizIndex++;
   showQuestion();
 }
 
-// 🔥 IMPORTANT: FETCH FULL DETAILS
-async function showResult() {
-  let best = Object.keys(answers).reduce((a,b)=>
-    answers[a] > answers[b] ? a : b
-  );
-
-  let skillMap = {
-    tech: "React",
-    data: "Data Science",
-    design: "UI/UX",
-    business: "Finance"
-  };
-
-  const selectedSkill = skillMap[best];
-
+function finishQuiz() {
+  const quizBox = document.getElementById("quizBox");
   quizBox.innerHTML = `
-    <div class="card">
-      <h2>🎯 Suggested Career</h2>
-      <br>
-      <strong>${selectedSkill}</strong>
-      <br><br>
-      <button onclick="restartQuiz()">🔄 Start Again</button>
-    </div>
+    <h3>Analysis Complete!</h3>
+    <p>We've gathered enough data to find your perfect role.</p>
+    <button onclick="restartQuiz()" class="btn-secondary">Restart Quiz</button>
   `;
-
-  // 🔥 LOAD FULL DETAILS INTO RESULT BOX
-  getSkillDetails(selectedSkill);
+  fetchAIResponse({ answers: answers });
 }
 
 function restartQuiz() {
+  const quizBox = document.getElementById("quizBox");
   quizBox.innerHTML = `
-    <h2>🧠 Not sure? Answer a few questions</h2>
-    <button onclick="startQuiz()">Start Questions</button>
+    <h3>Not sure what to do?</h3>
+    <p>Let our AI evaluate your profile through 4 quick questions.</p>
+    <button onclick="startQuiz()" class="btn-secondary">Start Assessment 🚀</button>
+  `;
+  resultArea.classList.add("hidden");
+}
+
+// ================= RENDER =================
+function renderResult(data) {
+  const html = `
+    <div class="result-card">
+      <div class="result-header">
+        <h2>${data.role || "Unknown Role"}</h2>
+        <p style="color: var(--text-muted)">Based on Gemini AI Analysis ✨</p>
+      </div>
+      
+      <div class="result-grid">
+        <div class="data-group">
+          <h4>Expected Salary</h4>
+          <p>💰 ${data.salary || "Variable"}</p>
+        </div>
+        <div class="data-group">
+          <h4>Market Demand</h4>
+          <p>📈 ${data.demand || "High"}</p>
+        </div>
+        <div class="data-group">
+          <h4>Career Levels</h4>
+          <p>🚀 ${data.levels || "Junior -> Senior"}</p>
+        </div>
+      </div>
+      
+      <div class="data-group" style="margin-bottom: 24px;">
+        <h4>Key Skills</h4>
+        <ul>
+          ${(data.skills || []).map(skill => `<li>${skill}</li>`).join("")}
+        </ul>
+      </div>
+
+      <div class="data-group" style="margin-bottom: 24px;">
+        <h4>Suggested Roadmap</h4>
+        <p>🗺️ ${data.roadmap || "Learn basics, build projects, apply."}</p>
+      </div>
+      
+      <div class="tip-box">
+        <h4>Pro Tip 🔥</h4>
+        <p>${data.tip || "Stay consistent and build projects."}</p>
+      </div>
+    </div>
+  `;
+  resultContent.innerHTML = html;
+}
+
+function renderError(msg) {
+  resultContent.innerHTML = `
+    <div class="result-card" style="border-color: rgba(239, 68, 68, 0.3)">
+      <h3 style="color: #f87171; margin-bottom: 10px;">⚠️ Analysis Failed</h3>
+      <p>${msg}</p>
+      <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-muted)">Ensure you have a valid GEMINI_API_KEY in your .env file and check file types.</p>
+    </div>
   `;
 }
