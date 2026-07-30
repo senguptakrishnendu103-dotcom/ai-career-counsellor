@@ -41,7 +41,7 @@ app.post("/api/counsel", async (req, res) => {
     if (answers) {
        prompt = `I have taken a career quiz. My tech interest score is ${answers.tech}, data score is ${answers.data}, design score is ${answers.design}, business score is ${answers.business}. Based on this, suggest ONE best fitting modern career role. Provide the response as a JSON object with the following keys:
        "role" (string, the career title),
-       "roadmap" (string, high-level path to learn),
+       "roadmap" (array of objects, each with "title" (string, step/phase title) and "description" (string, actionable details to learn), representing a sequential 3-4 step path),
        "skills" (array of strings, top 4-5 skills),
        "levels" (string, career progression e.g., Junior -> Senior),
        "salary" (string, realistic expected salary range in India, e.g., ₹8L-₹20L),
@@ -51,7 +51,7 @@ app.post("/api/counsel", async (req, res) => {
     } else if (interest) {
        prompt = `I am interested in ${interest}. Suggest the best fitting modern career role for this. Provide the response as a JSON object with the following keys:
        "role" (string, the career title),
-       "roadmap" (string, high-level path to learn),
+       "roadmap" (array of objects, each with "title" (string, step/phase title) and "description" (string, actionable details to learn), representing a sequential 3-4 step path),
        "skills" (array of strings, top 4-5 skills),
        "levels" (string, career progression e.g., Junior -> Senior),
        "salary" (string, realistic expected salary range in India, e.g., ₹8L-₹20L),
@@ -97,7 +97,7 @@ app.post("/api/upload-resume", upload.single("resume"), async (req, res) => {
     ---
     Provide the response as a JSON object with the following keys:
     "role" (string, the career title),
-    "roadmap" (string, high-level path to learn/improve),
+    "roadmap" (array of objects, each with "title" (string, step/phase title) and "description" (string, actionable details to learn/improve), representing a sequential 3-4 step path),
     "skills" (array of strings, top 4-5 skills I have or need),
     "levels" (string, career progression e.g., Junior -> Senior),
     "salary" (string, realistic expected salary range in India, e.g., ₹8L-₹20L),

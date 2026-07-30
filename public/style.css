@@ -375,17 +375,32 @@ input:focus {
   margin-bottom: 24px;
 }
 
+/* Glassmorphic mini-cards inside grid */
+.result-grid .data-group {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 16px;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.result-grid .data-group:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
 .data-group h4 {
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: 8px;
 }
 
 .data-group p, .data-group ul {
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .data-group ul {
@@ -395,24 +410,113 @@ input:focus {
   gap: 8px;
 }
 
+/* Interactive Pill Tags */
 .data-group li {
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.25);
   color: #c4b5fd;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
+.data-group li:hover {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-1px) scale(1.03);
+}
+
+/* Timeline Roadmaps */
+.timeline {
+  position: relative;
+  margin: 20px 0;
+  padding-left: 24px;
+  border-left: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -31px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid var(--bg-dark);
+  box-shadow: 0 0 8px var(--primary);
+  transition: transform 0.2s ease;
+}
+
+.timeline-item:hover::before {
+  transform: scale(1.3);
+}
+
+.timeline-step {
+  font-size: 0.75rem;
+  color: var(--secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.timeline-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.timeline-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.roadmap-text-fallback {
+  line-height: 1.6;
+}
+
+.roadmap-text-fallback strong {
+  color: var(--secondary);
+}
+
+/* Tip Box Design */
 .tip-box {
-  background: linear-gradient(to right, rgba(236, 72, 153, 0.1), transparent);
+  background: linear-gradient(to right, rgba(236, 72, 153, 0.08), rgba(236, 72, 153, 0.02));
+  border: 1px solid rgba(236, 72, 153, 0.2);
   border-left: 4px solid var(--secondary);
-  padding: 16px;
-  border-radius: 0 12px 12px 0;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 24px;
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.05);
 }
 
 .tip-box h4 {
   color: var(--secondary);
-  margin-bottom: 4px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.tip-box p {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  line-height: 1.5;
 }
 
 @media (max-width: 600px) {
@@ -457,9 +561,53 @@ input:focus {
 
 .pdf-mode .tip-box {
   background: #fff1f2 !important;
+  border: 1px solid rgba(225, 29, 72, 0.2) !important;
   border-left: 4px solid #e11d48 !important;
 }
 
 .pdf-mode .tip-box h4 {
   color: #e11d48 !important;
+}
+
+/* Timeline Print Styles */
+.pdf-mode .timeline {
+  border-left: 2px solid #cbd5e1 !important;
+}
+
+.pdf-mode .timeline-item::before {
+  background: #8b5cf6 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: none !important;
+}
+
+.pdf-mode .timeline-step {
+  color: #db2777 !important;
+}
+
+.pdf-mode .timeline-title {
+  color: #000000 !important;
+}
+
+.pdf-mode .timeline-desc {
+  color: #334155 !important;
+}
+
+/* Hide buttons and interactive controls in PDF */
+.pdf-mode button, 
+.pdf-mode .btn-primary, 
+.pdf-mode .btn-secondary {
+  display: none !important;
+}
+
+/* Small spinner for button loading state */
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-left-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
 }

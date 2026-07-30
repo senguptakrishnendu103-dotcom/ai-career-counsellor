@@ -201,6 +201,28 @@ function restartQuiz() {
 
 // ================= RENDER =================
 function renderResult(data) {
+  let roadmapHtml = '';
+  if (Array.isArray(data.roadmap)) {
+    roadmapHtml = `
+      <div class="timeline">
+        ${data.roadmap.map((item, idx) => `
+          <div class="timeline-item">
+            <div class="timeline-step">Step ${idx + 1}</div>
+            <div class="timeline-title">${item.title || "Next Step"}</div>
+            <div class="timeline-desc">${item.description || ""}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  } else if (typeof data.roadmap === 'string') {
+    const parsedText = data.roadmap
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\* (.*?)/g, '<li>$1</li>');
+    roadmapHtml = `<p class="roadmap-text-fallback">🗺️ ${parsedText}</p>`;
+  } else {
+    roadmapHtml = `<p>🗺️ Learn basics, build projects, apply.</p>`;
+  }
+
   const html = `
     <div class="result-card">
       <div class="result-header">
@@ -232,12 +254,18 @@ function renderResult(data) {
 
       <div class="data-group" style="margin-bottom: 24px;">
         <h4>Suggested Roadmap</h4>
-        <p>🗺️ ${data.roadmap || "Learn basics, build projects, apply."}</p>
+        ${roadmapHtml}
       </div>
       
-      <div class="tip-box">
+      <div class="tip-box" style="margin-bottom: 24px;">
         <h4>Pro Tip 🔥</h4>
         <p>${data.tip || "Stay consistent and build projects."}</p>
+      </div>
+
+      <div style="text-align: center; margin-top: 32px;">
+        <button onclick="downloadPDF(event)" class="btn-primary pdf-btn" style="margin: 0 auto; display: inline-flex;">
+          Download PDF Roadmap <span class="icon">📥</span>
+        </button>
       </div>
     </div>
   `;
@@ -252,4 +280,34 @@ function renderError(msg) {
       <p style="font-size: 0.9rem; margin-top: 10px; color: var(--text-muted)">Ensure you have a valid GEMINI_API_KEY in your .env file and check file types.</p>
     </div>
   `;
+}
+
+function downloadPDF(event) {
+  const btn = event.currentTarget;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'Generating PDF... <span class="spinner-small"></span>';
+  btn.disabled = true;
+
+  const element = document.getElementById("resultContent");
+  
+  const opt = {
+    margin:       15,
+    filename:     'Career_Roadmap.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  element.classList.add("pdf-mode");
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    element.classList.remove("pdf-mode");
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }).catch(err => {
+    console.error("PDF generation error:", err);
+    element.classList.remove("pdf-mode");
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  });
 }
