@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Format message history for Gemini chat
-    const systemPrompt = `You are "CareerAI Mentor", an expert career counselor, academic advisor, and resume coach. 
+    const systemPrompt = `You are "CareerVerse Mentor", an expert career counselor, academic advisor, and resume coach. 
     You are professional, encouraging, and provide concrete, actionable advice. 
     Answer questions about careers, colleges, resume fixes, interview preparation, learning paths, and salary trends. 
     Keep responses concise, using formatting like bullet points where relevant.`;

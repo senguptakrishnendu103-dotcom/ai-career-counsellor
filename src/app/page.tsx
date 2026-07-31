@@ -363,7 +363,7 @@ export default function CareerCounsellor() {
   const [chatMessages, setChatMessages] = useState<any[]>([
     {
       role: "model",
-      content: "Hello! I am your CareerAI Mentor. Ask me any career, college, resume or preparation questions, and let's structure your future today!"
+      content: "Hello! I am your CareerVerse Mentor. Ask me any career, college, resume or preparation questions, and let's structure your future today!"
     }
   ]);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -428,7 +428,7 @@ export default function CareerCounsellor() {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold tracking-tight">
-            Career<span className="text-purple-400">AI</span> Pro
+            Career<span className="text-purple-400">Verse</span>
           </span>
         </div>
 
@@ -1364,7 +1364,7 @@ export default function CareerCounsellor() {
                       <div className="flex items-center gap-3">
                         <div className="w-3.5 h-3.5 rounded-full bg-green-500 animate-pulse"></div>
                         <div className="text-left">
-                          <h4 className="font-bold text-sm leading-none">CareerAI Mentor</h4>
+                          <h4 className="font-bold text-sm leading-none">CareerVerse Mentor</h4>
                           <span className="text-[10px] text-slate-500 font-semibold mt-0.5">Online assistant (Gemini)</span>
                         </div>
                       </div>
@@ -1577,7 +1577,7 @@ export default function CareerCounsellor() {
 
       {/* ================= FOOTER ================= */}
       <footer className="w-full py-8 border-t border-white/5 mt-16 text-center flex flex-col md:flex-row items-center justify-between gap-6 px-4">
-        <span className="text-xs text-slate-500">© 2026 CareerAI Pro Inc. All rights reserved.</span>
+        <span className="text-xs text-slate-500">© 2026 CareerVerse Inc. All rights reserved.</span>
         <div className="flex items-center gap-6 text-xs text-slate-400">
           <button onClick={() => setActiveTab("landing")} className="hover:text-white transition-colors">About Us</button>
           <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
@@ -1678,7 +1678,7 @@ export default function CareerCounsellor() {
               <div className="text-center text-xs text-slate-500 mt-6">
                 {authMode === "login" ? (
                   <span>
-                    New to CareerAI?{" "}
+                    New to CareerVerse?{" "}
                     <button onClick={() => setAuthMode("signup")} className="text-purple-400 hover:underline">
                       Create Account
                     </button>
@@ -1724,7 +1724,7 @@ export default function CareerCounsellor() {
                 <Play className="w-16 h-16 text-purple-500 animate-pulse cursor-pointer" />
               </div>
               <div className="z-10 mt-auto text-left">
-                <h4 className="text-lg font-bold">CareerAI Pro Platform Walkthrough</h4>
+                <h4 className="text-lg font-bold">CareerVerse Platform Walkthrough</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
                   Learn how our interactive questionnaire and resume ATS parser helps thousands of engineering students find and target optimal career opportunities.
                 </p>

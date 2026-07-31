@@ -8,7 +8,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "CareerAI Pro | Premium AI Career Guidance & Mentorship",
+  title: "CareerVerse | Premium AI Career Guidance & Mentorship",
   description: "Discover your ideal career path using the power of advanced AI recommendations, ATS resume analysis, custom roadmaps, and 24/7 mentoring.",
 };
 
