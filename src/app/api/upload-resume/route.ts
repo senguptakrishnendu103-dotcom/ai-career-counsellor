@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import pdfParse from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 
 const getFallbackKey = () => {
   const p1 = "AIzaSyCOoGtzWi-pHyn";
@@ -23,12 +23,22 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     
     let resumeText = "";
+    let pdfParser: PDFParse | null = null;
     try {
-      const data = await pdfParse(buffer);
-      resumeText = data.text;
+      pdfParser = new PDFParse({ data: buffer });
+      const textResult = await pdfParser.getText();
+      resumeText = textResult.text;
     } catch (parseError) {
       console.warn("PDF parsing failed, falling back to mock parser text:", parseError);
       resumeText = "Skills: JavaScript, React, Python, HTML, CSS. Experience: Frontend developer at XYZ Corp.";
+    } finally {
+      if (pdfParser) {
+        try {
+          await pdfParser.destroy();
+        } catch (destroyError) {
+          console.warn("Failed to destroy PDF parser:", destroyError);
+        }
+      }
     }
 
     const prompt = `Analyze this resume content for ATS optimization. Provide feedback on how to improve it to match modern developer/industry standards.
