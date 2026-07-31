@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 import {
   Sparkles,
   UploadCloud,
@@ -177,8 +178,40 @@ export default function CareerCounsellor() {
 
   const [authForm, setAuthForm] = useState({ name: "", email: "", password: "" });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (supabase) {
+      if (authMode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email: authForm.email,
+          password: authForm.password,
+          options: {
+            data: {
+              name: authForm.name || "Akash Sengupta"
+            }
+          }
+        });
+        if (error) {
+          alert("Sign up error: " + error.message);
+          return;
+        }
+        alert("Registration successful! Check your email for verification link, or log in if your instance skips verification.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: authForm.email,
+          password: authForm.password
+        });
+        if (error) {
+          alert("Sign in error: " + error.message);
+          return;
+        }
+      }
+      setAuthModalOpen(false);
+      setActiveTab("dashboard");
+      return;
+    }
+
     const userData = {
       name: authForm.name || "Akash Sengupta",
       email: authForm.email || "akash@example.com",
@@ -221,7 +254,10 @@ export default function CareerCounsellor() {
     setActiveTab("dashboard");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     setUser(null);
     localStorage.removeItem("careerverse_user");
     setActiveTab("landing");
@@ -687,17 +723,64 @@ export default function CareerCounsellor() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Load user session from localStorage on mount
+  // Load user session from Supabase or localStorage fallback on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem("careerverse_user");
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-        setActiveTab("dashboard");
-      } catch (err) {
-        console.error("Error reading saved user session:", err);
+    let unsubscribe: (() => void) | undefined;
+
+    const checkSession = async () => {
+      const supabaseClient = supabase;
+      if (supabaseClient) {
+        try {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          if (session?.user) {
+            const { data: profile } = await supabaseClient
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
+            if (profile) {
+              setUser(profile as any);
+              setActiveTab("dashboard");
+            }
+          }
+          
+          const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session?.user) {
+              const { data: profile } = await supabaseClient
+                .from("profiles")
+                .select("*")
+                .eq("id", session.user.id)
+                .single();
+              if (profile) {
+                setUser(profile as any);
+                setActiveTab("dashboard");
+              }
+            } else if (event === "SIGNED_OUT") {
+              setUser(null);
+              setActiveTab("landing");
+            }
+          });
+          unsubscribe = () => subscription.unsubscribe();
+        } catch (err) {
+          console.error("Supabase session load error, falling back:", err);
+        }
+      } else {
+        const savedUser = localStorage.getItem("careerverse_user");
+        if (savedUser) {
+          try {
+            setUser(JSON.parse(savedUser));
+            setActiveTab("dashboard");
+          } catch (err) {
+            console.error("Error reading saved user session:", err);
+          }
+        }
       }
-    }
+    };
+
+    checkSession();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   // AI Copilot Send Message
