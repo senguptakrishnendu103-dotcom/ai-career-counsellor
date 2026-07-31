@@ -33,7 +33,19 @@ import {
   HelpCircle,
   Users,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  Bell,
+  Globe,
+  Mic,
+  Plus,
+  Square,
+  CheckSquare,
+  Video,
+  VideoOff,
+  ArrowLeft,
+  Trash2,
+  Activity,
+  Command
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -60,6 +72,20 @@ interface UserProfile {
   assessmentHistory: { date: string; result: string }[];
   completedSteps: number;
   totalSteps: number;
+  goals: string[];
+  skills: string[];
+  weakAreas: string[];
+  certifications: string[];
+  readinessScore: number;
+  confidenceScore: number;
+  weeklyProgress: number[];
+  placementReady: boolean;
+  trackerJobs: { company: string; role: string; status: string; date: string }[];
+  studyHours: number;
+  consistencyScore: number;
+  completionPercentage: number;
+  missions: { id: number; task: string; completed: boolean }[];
+  interviewHistory: { role: string; type: string; date: string; score: number; feedback: string }[];
 }
 
 const mockBlogs = [
@@ -121,7 +147,32 @@ export default function CareerCounsellor() {
       { date: "2026-07-30", result: "AI Research Scientist" }
     ],
     completedSteps: 12,
-    totalSteps: 20
+    totalSteps: 20,
+    goals: ["Get a remote AI Software Engineer job", "Build an open-source React library", "Pass AWS Solutions Architect certification"],
+    skills: ["React/Next.js", "TypeScript", "Python", "Tailwind CSS", "REST APIs"],
+    weakAreas: ["System Design", "Algorithms & Data Structures", "Public Speaking"],
+    certifications: ["AWS Certified Cloud Practitioner", "Google Data Analytics Professional Cert"],
+    readinessScore: 78,
+    confidenceScore: 82,
+    weeklyProgress: [40, 60, 45, 80, 50, 90, 70],
+    placementReady: true,
+    trackerJobs: [
+      { company: "Vercel", role: "Junior Frontend Engineer", status: "Applied", date: "2026-07-28" },
+      { company: "Stripe", role: "Software Engineer Intern", status: "Interviewing", date: "2026-07-25" },
+      { company: "Linear", role: "Product Engineer", status: "Rejected", date: "2026-07-15" }
+    ],
+    studyHours: 18,
+    consistencyScore: 88,
+    completionPercentage: 68,
+    missions: [
+      { id: 1, task: "Complete Next.js routing course module", completed: true },
+      { id: 2, task: "Upload and analyze resume with ATS reviewer", completed: true },
+      { id: 3, task: "Practice one AI behavioral interview session", completed: false }
+    ],
+    interviewHistory: [
+      { role: "Frontend Developer", type: "Technical", date: "2026-07-29", score: 85, feedback: "Great React knowledge. Needs slight improvement in CSS grid/flexbox edge cases." },
+      { role: "Software Engineer", type: "HR", date: "2026-07-26", score: 92, feedback: "Excellent communication skills and strong alignment with company values." }
+    ]
   });
 
   const [authForm, setAuthForm] = useState({ name: "", email: "", password: "" });
@@ -137,7 +188,32 @@ export default function CareerCounsellor() {
       savedCareers: [],
       assessmentHistory: [],
       completedSteps: 0,
-      totalSteps: 15
+      totalSteps: 15,
+      goals: ["Get a remote AI Software Engineer job", "Build an open-source React library", "Pass AWS Solutions Architect certification"],
+      skills: ["React/Next.js", "TypeScript", "Python", "Tailwind CSS", "REST APIs"],
+      weakAreas: ["System Design", "Algorithms & Data Structures", "Public Speaking"],
+      certifications: ["AWS Certified Cloud Practitioner", "Google Data Analytics Professional Cert"],
+      readinessScore: 78,
+      confidenceScore: 82,
+      weeklyProgress: [40, 60, 45, 80, 50, 90, 70],
+      placementReady: true,
+      trackerJobs: [
+        { company: "Vercel", role: "Junior Frontend Engineer", status: "Applied", date: "2026-07-28" },
+        { company: "Stripe", role: "Software Engineer Intern", status: "Interviewing", date: "2026-07-25" },
+        { company: "Linear", role: "Product Engineer", status: "Rejected", date: "2026-07-15" }
+      ],
+      studyHours: 18,
+      consistencyScore: 88,
+      completionPercentage: 68,
+      missions: [
+        { id: 1, task: "Complete Next.js routing course module", completed: true },
+        { id: 2, task: "Upload and analyze resume with ATS reviewer", completed: true },
+        { id: 3, task: "Practice one AI behavioral interview session", completed: false }
+      ],
+      interviewHistory: [
+        { role: "Frontend Developer", type: "Technical", date: "2026-07-29", score: 85, feedback: "Great React knowledge. Needs slight improvement in CSS grid/flexbox edge cases." },
+        { role: "Software Engineer", type: "HR", date: "2026-07-26", score: 92, feedback: "Excellent communication skills and strong alignment with company values." }
+      ]
     });
     setAuthModalOpen(false);
     setActiveTab("dashboard");
@@ -398,6 +474,7 @@ export default function CareerCounsellor() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
+
   // ================= ADMIN CONSOLE STATE =================
   const [adminCareers, setAdminCareers] = useState<string[]>([
     "AI Research Scientist",
@@ -417,6 +494,283 @@ export default function CareerCounsellor() {
       setAdminCareers(prev => [...prev, newCareerInput.trim()]);
       setNewCareerInput("");
     }
+  };
+
+  // ================= NEW CAREER OS STATE & WIDGETS =================
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: "Google Generation Scholarship application is live!", date: "Today", read: false },
+    { id: 2, text: "Vercel is hiring remote Frontend Interns. Apply now!", date: "1 day ago", read: false },
+    { id: 3, text: "Hackathon: Smart India Hackathon 2026 starts in 10 days.", date: "3 days ago", read: true }
+  ]);
+
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [commandQuery, setCommandQuery] = useState("");
+
+  const [copilotOpen, setCopilotOpen] = useState(false);
+  const [copilotInput, setCopilotInput] = useState("");
+  const [copilotMessages, setCopilotMessages] = useState([
+    { role: "model", content: "Hi Akash! I am your CareerVerse Copilot. Ask me anything, and I will recommend actions based on your current readiness score (78%)!" }
+  ]);
+  const [copilotLoading, setCopilotLoading] = useState(false);
+  const copilotEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    copilotEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [copilotMessages]);
+
+  // Toggle mission status and dynamically adjust confidence & progress score
+  const handleToggleMission = (missionId: number) => {
+    if (!user) return;
+    const updatedMissions = user.missions.map(m => {
+      if (m.id === missionId) return { ...m, completed: !m.completed };
+      return m;
+    });
+    const completedCount = updatedMissions.filter(m => m.completed).length;
+    const completionPercentage = Math.round((completedCount / updatedMissions.length) * 100);
+    const newConfidence = Math.min(100, 70 + completedCount * 10);
+    
+    // Add to weekly progress
+    const newProgress = [...user.weeklyProgress];
+    newProgress[newProgress.length - 1] = Math.min(100, newProgress[newProgress.length - 1] + 5);
+
+    setUser({
+      ...user,
+      missions: updatedMissions,
+      completionPercentage,
+      confidenceScore: newConfidence,
+      weeklyProgress: newProgress
+    });
+  };
+
+  // Add Job Tracking application
+  const [newJobForm, setNewJobForm] = useState({ company: "", role: "", status: "Applied" });
+  const handleAddJobTracker = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !newJobForm.company || !newJobForm.role) return;
+    const newJobs = [
+      ...user.trackerJobs,
+      {
+        company: newJobForm.company,
+        role: newJobForm.role,
+        status: newJobForm.status,
+        date: new Date().toISOString().split('T')[0]
+      }
+    ];
+    // Increase readiness score dynamically
+    const newReadiness = Math.min(100, user.readinessScore + 3);
+    setUser({
+      ...user,
+      trackerJobs: newJobs,
+      readinessScore: newReadiness
+    });
+    setNewJobForm({ company: "", role: "", status: "Applied" });
+  };
+
+  // Study Planner Missed Tasks Adaptiveness
+  const [studyMissions, setStudyMissions] = useState([
+    { day: "Monday", task: "Next.js routing patterns (2 hrs)", completed: true },
+    { day: "Tuesday", task: "Solve 2 Leetcode Tree questions (1.5 hrs)", completed: true },
+    { day: "Wednesday", task: "Upload resume to ATS reviewer (1 hr)", completed: false },
+    { day: "Thursday", task: "AWS Certified Practitioner mock exam (2.5 hrs)", completed: false },
+    { day: "Friday", task: "Design System Portfolio wireframes (2 hrs)", completed: false },
+    { day: "Saturday", task: "Gemini API integration coding (3 hrs)", completed: false },
+    { day: "Sunday", task: "Mock Behavioral Interview practice (1.5 hrs)", completed: false }
+  ]);
+  const [adaptiveMessage, setAdaptiveMessage] = useState("");
+
+  const handleAdaptiveReschedule = () => {
+    // Collect incomplete tasks and shift them/distribute
+    const updated = studyMissions.map((m) => {
+      // If wednesday (yesterday) was incomplete, push it to Saturday, etc.
+      if (m.day === "Wednesday" && !m.completed) {
+        return { ...m, task: m.task + " (Rescheduled)", day: "Saturday" };
+      }
+      return m;
+    });
+    setStudyMissions(updated);
+    setAdaptiveMessage("Daily schedule adjusted! Missed tasks have been moved and distributed to the weekend.");
+    setTimeout(() => setAdaptiveMessage(""), 5000);
+  };
+
+  // AI Portfolio Builder state
+  const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
+  const [portfolioGenerated, setPortfolioGenerated] = useState(false);
+  const [portfolioData, setPortfolioData] = useState({
+    theme: "Dark Neon",
+    name: "Akash Sengupta",
+    title: "AI & Fullstack Engineer",
+    bio: "Building production-grade web systems powered by Gemini 2.5 and Next.js.",
+    skills: "React, Next.js, TypeScript, Node.js, Python, Tailwind, REST APIs",
+    projects: "AI Resume ATS, blockchain-voting, CareerVerse, Real-time Chat",
+    github: "github.com/senguptakrishnendu103-dotcom",
+    linkedin: "linkedin.com/in/akash-sengupta"
+  });
+
+  // AI Interview Lab track states
+  const [interviewTrack, setInterviewTrack] = useState<"Behavioral" | "Coding" | "HR" | "System Design">("Behavioral");
+  const [interviewStep, setInterviewStep] = useState<"setup" | "simulating" | "feedback">("setup");
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userInterviewAnswer, setUserInterviewAnswer] = useState("");
+  const [simulatedVideoState, setSimulatedVideoState] = useState(false);
+  
+  const interviewQuestions = {
+    Behavioral: [
+      "Tell me about a time you resolved a major bug in a production environment under pressure.",
+      "How do you handle disagreement with a technical lead or product owner?",
+      "Describe a project you worked on where you had to learn a completely new technology quickly."
+    ],
+    Coding: [
+      "Write a function to detect if a linked list contains a cycle. What is the time complexity?",
+      "Implement a function that finds the longest palindromic substring in a string.",
+      "Explain the difference between CSR, SSR, and ISR in Next.js, and when to use each."
+    ],
+    HR: [
+      "Why do you want to join our organization as an AI Software Engineer?",
+      "Where do you see yourself in 5 years? What skills do you want to master?",
+      "What are your salary expectations, and how do you define success in your role?"
+    ],
+    "System Design": [
+      "How would you design a scalable real-time notification system like Slack?",
+      "Explain how you would handle distributed rate limiting in a microservices ecosystem.",
+      "Design a system to support high-throughput file uploads (e.g. large PDF resumes) with parsing."
+    ]
+  };
+
+  const [aiInterviewFeedback, setAiInterviewFeedback] = useState({
+    confidenceScore: 85,
+    eyeContactRating: "Excellent (92% direct focus)",
+    commAnalysis: "Clear articulation, moderate pacing. Filler words used: 'like' (1x), 'um' (2x). Good logical structure using STAR framework.",
+    answerQuality: "Strong. Demonstrates deep understanding of development cycles, team communication, and automated testing.",
+    improvementTips: "Try to specify the exact metrics of your impact (e.g., 'reduced render times by 35%') to strengthen your STAR outcomes."
+  });
+
+  const handleSendInterviewAnswer = () => {
+    if (!userInterviewAnswer.trim()) return;
+    
+    if (currentQuestionIndex < interviewQuestions[interviewTrack].length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setUserInterviewAnswer("");
+    } else {
+      setInterviewStep("feedback");
+      // Add to user interview history
+      if (user) {
+        setUser({
+          ...user,
+          interviewHistory: [
+            ...user.interviewHistory,
+            {
+              role: `${interviewTrack} Sim`,
+              type: interviewTrack,
+              date: new Date().toISOString().split('T')[0],
+              score: 85,
+              feedback: "Articulation is clear. STAR structure followed successfully. Tips: add quantitative metrics."
+            }
+          ]
+        });
+      }
+    }
+  };
+
+  // Keyboard Shortcuts for Command Palette (Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // AI Copilot Send Message
+  const handleSendCopilotMessage = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!copilotInput.trim()) return;
+    
+    const userMsg = { role: "user", content: copilotInput };
+    setCopilotMessages(prev => [...prev, userMsg]);
+    setCopilotInput("");
+    setCopilotLoading(true);
+
+    try {
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: `You are CareerVerse Copilot. The user has: Goals: ${user?.goals.join(", ")}, Skills: ${user?.skills.join(", ")}, Weak Areas: ${user?.weakAreas.join(", ")}, Certifications: ${user?.certifications.join(", ")}, Readiness Score: ${user?.readinessScore}%. Answer user query: ${userMsg.content}`
+            }
+          ]
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCopilotMessages(prev => [...prev, { role: "model", content: data.response }]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCopilotLoading(false);
+    }
+  };
+
+  // AI Copilot Send Suggestion Chip
+  const handleSendCopilotSuggestion = async (suggestionText: string) => {
+    const userMsg = { role: "user", content: suggestionText };
+    setCopilotMessages(prev => [...prev, userMsg]);
+    setCopilotLoading(true);
+
+    try {
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: `You are CareerVerse Copilot. The user has: Goals: ${user?.goals.join(", ")}, Skills: ${user?.skills.join(", ")}, Weak Areas: ${user?.weakAreas.join(", ")}, Certifications: ${user?.certifications.join(", ")}, Readiness Score: ${user?.readinessScore}%. Answer user query: ${userMsg.content}`
+            }
+          ]
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCopilotMessages(prev => [...prev, { role: "model", content: data.response }]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCopilotLoading(false);
+    }
+  };
+
+  // Community Hub state
+  const [communityPosts, setCommunityPosts] = useState([
+    { id: 1, author: "Suresh Kumar", role: "React Dev", text: "Just completed the Next.js 15 routing course! Celebrating this milestone.", likes: 8, comments: 2, date: "2 hrs ago" },
+    { id: 2, author: "Priya Das", role: "AI Student", text: "Looking for teammates for the upcoming Vercel Hackathon. Tech stack: Python, Next.js.", likes: 12, comments: 5, date: "5 hrs ago" }
+  ]);
+  const [newPostText, setNewPostText] = useState("");
+
+  const handleCreatePost = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPostText.trim()) return;
+    setCommunityPosts([
+      {
+        id: Date.now(),
+        author: user?.name || "Akash Sengupta",
+        role: "Member",
+        text: newPostText,
+        likes: 0,
+        comments: 0,
+        date: "Just now"
+      },
+      ...communityPosts
+    ]);
+    setNewPostText("");
   };
 
   return (
@@ -487,6 +841,68 @@ export default function CareerCounsellor() {
                   <ShieldAlert className="w-3.5 h-3.5" /> Admin
                 </button>
               )}
+              {/* Command Palette Indicator */}
+              <button
+                onClick={() => setCommandPaletteOpen(true)}
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/5 bg-white/3 hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-all text-xs font-semibold"
+                title="Search or Quick Actions"
+              >
+                <Command className="w-3.5 h-3.5" />
+                <span>Search</span>
+                <kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px] ml-1">Ctrl+K</kbd>
+              </button>
+
+              {/* Notification Bell */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-2 rounded-lg border border-white/5 hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-colors relative"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {notifications.some(n => !n.read) && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-pink-500"></span>
+                  )}
+                </button>
+                
+                {/* Dropdown menu */}
+                <AnimatePresence>
+                  {showNotifications && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 mt-2 w-80 glass-panel border border-white/10 rounded-2xl shadow-2xl p-4 z-50 text-left"
+                    >
+                      <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-3">
+                        <span className="text-xs font-bold text-slate-200">Alert Center</span>
+                        <button
+                          onClick={() => {
+                            setNotifications(notifications.map(n => ({ ...n, read: true })));
+                          }}
+                          className="text-[10px] text-purple-400 hover:underline font-semibold"
+                        >
+                          Mark all read
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                        {notifications.map(n => (
+                          <div
+                            key={n.id}
+                            className={`p-2.5 rounded-xl border text-xs transition-all ${
+                              n.read ? 'bg-white/2 border-white/5 text-slate-400' : 'bg-purple-500/5 border-purple-500/10 text-slate-200 font-medium'
+                            }`}
+                          >
+                            <p>{n.text}</p>
+                            <span className="text-[10px] text-slate-500 block mt-1">{n.date}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <div className="flex items-center gap-2">
                 <img
                   src={user.avatar}
@@ -790,8 +1206,12 @@ export default function CareerCounsellor() {
                   { id: "dashboard", label: "Dashboard Overview", icon: BarChart3 },
                   { id: "predictor", label: "Career Predictor", icon: Compass },
                   { id: "resume", label: "Resume Analyzer", icon: UploadCloud },
-                  { id: "roadmap", label: "Roadmap Generator", icon: Award },
-                  { id: "chatbot", label: "AI Chat Mentor", icon: MessageSquare }
+                  { id: "roadmap", label: "Roadmap & Projects", icon: Award },
+                  { id: "study-planner", label: "AI Study Planner", icon: Calendar },
+                  { id: "portfolio-builder", label: "Portfolio Builder", icon: Sparkles },
+                  { id: "interview-lab", label: "AI Interview Lab", icon: Briefcase },
+                  { id: "community", label: "Community Hub", icon: Users },
+                  { id: "chatbot", label: "AI Career Copilot", icon: MessageSquare }
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -828,11 +1248,11 @@ export default function CareerCounsellor() {
                         <img src={user.avatar} className="w-16 h-16 rounded-full border border-purple-500/30 object-cover" />
                         <div>
                           <h3 className="text-xl font-bold">Welcome back, {user.name}!</h3>
-                          <p className="text-sm text-slate-400">Continue building your roadmap and searching careers.</p>
+                          <p className="text-sm text-slate-400">Your AI Career Copilot is online. View your Career OS dashboard below.</p>
                         </div>
                       </div>
                       {/* Streak badge */}
-                      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500/10 to-pink-500/10 border border-orange-500/20 text-orange-400">
                         <Flame className="w-5 h-5 fill-current" />
                         <div className="text-left">
                           <div className="text-xs text-slate-400 font-medium leading-none">Learning Streak</div>
@@ -841,69 +1261,293 @@ export default function CareerCounsellor() {
                       </div>
                     </div>
 
-                    {/* Dashboard Metrics Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left flex flex-col justify-between h-36">
-                        <span className="text-sm text-slate-400 font-semibold">Assessment Status</span>
-                        <div className="flex items-baseline gap-2 mt-4">
-                          <span className="text-3xl font-extrabold">{user.assessmentHistory.length}</span>
-                          <span className="text-xs text-slate-500">completed runs</span>
+                    {/* Career OS Metrics Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      {/* Readiness Score Gauge */}
+                      <div className="glass-panel border-white/5 p-5 rounded-2xl text-left flex flex-col justify-between h-40">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Career Readiness Score</span>
+                        <div className="flex items-center gap-4 mt-2">
+                          <div className="w-16 h-16 rounded-full border-4 border-purple-500/30 flex items-center justify-center relative bg-purple-500/5">
+                            <span className="text-lg font-black">{user.readinessScore}%</span>
+                          </div>
+                          <div>
+                            <span className="text-xs text-green-400 font-semibold flex items-center gap-0.5">▲ 4% this week</span>
+                            <p className="text-[10px] text-slate-500">Top 15% in SaaS Roles</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left flex flex-col justify-between h-36">
-                        <span className="text-sm text-slate-400 font-semibold">Saved Roadmaps</span>
-                        <div className="flex items-baseline gap-2 mt-4">
-                          <span className="text-3xl font-extrabold">{user.savedCareers.length}</span>
-                          <span className="text-xs text-slate-500">careers saved</span>
+
+                      {/* AI Confidence Meter */}
+                      <div className="glass-panel border-white/5 p-5 rounded-2xl text-left flex flex-col justify-between h-40">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">AI Confidence Score</span>
+                        <div className="flex items-center gap-4 mt-2">
+                          <div className="w-16 h-16 rounded-full border-4 border-pink-500/30 flex items-center justify-center relative bg-pink-500/5">
+                            <span className="text-lg font-black">{user.confidenceScore}%</span>
+                          </div>
+                          <div>
+                            <span className="text-xs text-pink-400 font-semibold">Adaptive Learning</span>
+                            <p className="text-[10px] text-slate-500">Stability: High</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left flex flex-col justify-between h-36">
-                        <span className="text-sm text-slate-400 font-semibold">Learning Progress</span>
-                        <div className="mt-4 flex flex-col gap-2">
+
+                      {/* Weekly Progress Widget */}
+                      <div className="glass-panel border-white/5 p-5 rounded-2xl text-left flex flex-col justify-between h-40">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Weekly Progress</span>
+                        <div className="mt-2 flex flex-col gap-2">
                           <div className="flex justify-between text-xs font-semibold">
-                            <span>Step {user.completedSteps} of {user.totalSteps}</span>
-                            <span>{Math.round((user.completedSteps / user.totalSteps) * 100)}%</span>
+                            <span>Missions</span>
+                            <span>{user.completionPercentage}%</span>
                           </div>
                           <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-purple-600 to-pink-500"
-                              style={{ width: `${(user.completedSteps / user.totalSteps) * 100}%` }}
+                              style={{ width: `${user.completionPercentage}%` }}
                             ></div>
                           </div>
+                          <span className="text-[10px] text-slate-500">Consistency Index: 88%</span>
+                        </div>
+                      </div>
+
+                      {/* Placement Readiness */}
+                      <div className="glass-panel border-white/5 p-5 rounded-2xl text-left flex flex-col justify-between h-40">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Placement Readiness</span>
+                        <div className="mt-2">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Verified Ready
+                          </span>
+                          <p className="text-[10px] text-slate-500 mt-2">3 applications active</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Progress Chart */}
-                    <div className="glass-panel border-white/5 p-6 rounded-2xl text-left">
-                      <h4 className="text-lg font-bold mb-6">Aptitude Score History</h4>
-                      <div className="w-full h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart
-                            data={[
-                              { name: "Week 1", Tech: 40, Analytics: 30, Business: 50 },
-                              { name: "Week 2", Tech: 55, Analytics: 45, Business: 55 },
-                              { name: "Week 3", Tech: 70, Analytics: 65, Business: 60 },
-                              { name: "Week 4", Tech: 85, Analytics: 80, Business: 65 }
-                            ]}
+                    {/* Skill Galaxy & Daily Missions row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Skill Galaxy SVG Visualization */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-md font-bold mb-1">Interactive Skill Galaxy</h4>
+                          <p className="text-xs text-slate-400 mb-6">Click a system orbit node to expand learning paths.</p>
+                        </div>
+                        <div className="relative w-full h-64 bg-slate-950/20 border border-white/5 rounded-xl flex items-center justify-center overflow-hidden">
+                          {/* Centered Node */}
+                          <div className="absolute w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500 flex items-center justify-center z-10 shadow-lg shadow-purple-500/20 animate-pulse">
+                            <Sparkles className="w-4 h-4 text-purple-300" />
+                          </div>
+
+                          {/* Orbits */}
+                          <div className="absolute w-24 h-24 border border-white/10 rounded-full animate-[spin_10s_linear_infinite]">
+                            <div className="absolute -top-1.5 left-1/2 -ml-1.5 w-3 h-3 rounded-full bg-pink-500 cursor-pointer" title="React/Next.js node" />
+                          </div>
+                          <div className="absolute w-44 h-44 border border-white/5 rounded-full animate-[spin_20s_linear_infinite_reverse]">
+                            <div className="absolute top-4 left-4 w-3.5 h-3.5 rounded-full bg-blue-500 cursor-pointer" title="TypeScript node" />
+                            <div className="absolute bottom-4 right-4 w-3 h-3 rounded-full bg-yellow-500 cursor-pointer" title="Python node" />
+                          </div>
+                          <div className="absolute w-60 h-60 border border-white/5 rounded-full animate-[spin_35s_linear_infinite]">
+                            <div className="absolute top-1/2 left-0 -mt-2 w-4 h-4 rounded-full bg-red-400 cursor-pointer" title="System Design node" />
+                            <div className="absolute top-1/2 right-0 -mt-2 w-3.5 h-3.5 rounded-full bg-green-400 cursor-pointer" title="Data Structures node" />
+                          </div>
+                          
+                          <div className="absolute bottom-2 left-3 text-[10px] text-slate-500 font-semibold">
+                            🪐 Interactive Skill Galaxy
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Daily Missions */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-md font-bold mb-1">AI Daily Missions</h4>
+                          <p className="text-xs text-slate-400 mb-6">Complete tasks to boost consistency and readiness score.</p>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          {user.missions.map((m) => (
+                            <button
+                              key={m.id}
+                              onClick={() => handleToggleMission(m.id)}
+                              className="w-full p-4 rounded-xl border border-white/5 bg-white/2 hover:bg-white/5 transition-all flex items-center justify-between text-left"
+                            >
+                              <div className="flex items-center gap-3">
+                                {m.completed ? (
+                                  <CheckSquare className="w-5 h-5 text-purple-400" />
+                                ) : (
+                                  <Square className="w-5 h-5 text-slate-500" />
+                                )}
+                                <span className={`text-sm ${m.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
+                                  {m.task}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
+                                {m.completed ? "+10 XP" : "Pending"}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Salary growth & heatmap row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Salary Growth Projection */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left lg:col-span-2">
+                        <h4 className="text-md font-bold mb-1">Salary Growth Projection (2026 - 2035)</h4>
+                        <p className="text-xs text-slate-400 mb-6">Gemini model expectations based on current career specialization.</p>
+                        <div className="w-full h-64">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart
+                              data={[
+                                { name: "2026", CurrentPath: 65000, AIDirected: 72000 },
+                                { name: "2028", CurrentPath: 78000, AIDirected: 95000 },
+                                { name: "2030", CurrentPath: 92000, AIDirected: 130000 },
+                                { name: "2032", CurrentPath: 110000, AIDirected: 175000 },
+                                { name: "2035", CurrentPath: 135000, AIDirected: 240000 }
+                              ]}
+                            >
+                              <defs>
+                                <linearGradient id="colorPath" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                </linearGradient>
+                                <linearGradient id="colorAI" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#d946ef" stopOpacity={0.3}/>
+                                  <stop offset="95%" stopColor="#d946ef" stopOpacity={0}/>
+                                </linearGradient>
+                              </defs>
+                              <XAxis dataKey="name" stroke="#475569" fontSize={11} />
+                              <YAxis stroke="#475569" fontSize={11} tickFormatter={(val: number) => `$${val/1000}k`} />
+                              <Tooltip contentStyle={{ backgroundColor: "#0b051e", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px" }} />
+                              <Area type="monotone" name="Standard Growth" dataKey="CurrentPath" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorPath)" />
+                              <Area type="monotone" name="CareerVerse Guided" dataKey="AIDirected" stroke="#d946ef" strokeWidth={2} fillOpacity={1} fill="url(#colorAI)" />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      {/* Industry Demand Heatmap */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left">
+                        <h4 className="text-md font-bold mb-1">Industry Demand Index</h4>
+                        <p className="text-xs text-slate-400 mb-6">Real-time hiring frequency indexes across sectors.</p>
+                        <div className="grid grid-cols-7 gap-2">
+                          {/* We will draw a nice contribution matrix of hiring heat map */}
+                          {Array.from({ length: 28 }).map((_, i) => {
+                            const weights = [1, 2, 4, 3, 2, 4, 3, 1, 2, 3, 4, 4, 2, 1, 2, 3, 4, 3, 2, 1, 4, 3, 4, 4, 3, 2, 1, 4];
+                            const weight = weights[i % weights.length];
+                            const colors = ["bg-white/5", "bg-purple-950/40", "bg-purple-800/40", "bg-purple-600/50", "bg-pink-500/70"];
+                            return (
+                              <div
+                                key={i}
+                                className={`w-full aspect-square rounded ${colors[weight]} transition-colors hover:scale-110 cursor-pointer`}
+                                title={`Activity index: ${weight * 25}%`}
+                              />
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-slate-500 mt-4 font-semibold">
+                          <span>Low Hiring</span>
+                          <div className="flex gap-1">
+                            <span className="w-2.5 h-2.5 rounded bg-white/5" />
+                            <span className="w-2.5 h-2.5 rounded bg-purple-950/40" />
+                            <span className="w-2.5 h-2.5 rounded bg-purple-800/40" />
+                            <span className="w-2.5 h-2.5 rounded bg-purple-600/50" />
+                            <span className="w-2.5 h-2.5 rounded bg-pink-500/70" />
+                          </div>
+                          <span>High Hiring</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Today's Recommendation & Internship Tracker Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Learning Recommendation */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-md font-bold mb-1">Today's Daily Recommendation</h4>
+                          <span className="text-[10px] uppercase font-bold text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded border border-pink-500/20">Skill Gap Focus</span>
+                          <p className="text-sm text-slate-200 mt-4 leading-relaxed font-semibold">
+                            "System Design" is marked as your growth area.
+                          </p>
+                          <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                            We recommend enrolling in the MIT 6.006 Algorithms & Harvard CS50 curriculum.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setActiveTab("learning")}
+                          className="w-full mt-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-semibold transition-colors"
+                        >
+                          Enrol in Classes
+                        </button>
+                      </div>
+
+                      {/* Internship Tracker table */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl text-left lg:col-span-2">
+                        <h4 className="text-md font-bold mb-1">Internship Application Pipeline</h4>
+                        <p className="text-xs text-slate-400 mb-4">Track progress of your applications in one unified pipeline.</p>
+                        
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs border-collapse">
+                            <thead>
+                              <tr className="border-b border-white/5 text-slate-500 font-bold">
+                                <th className="pb-2">Company</th>
+                                <th className="pb-2">Role</th>
+                                <th className="pb-2">Status</th>
+                                <th className="pb-2">Applied Date</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {user.trackerJobs.map((job, idx) => (
+                                <tr key={idx} className="border-b border-white/5 last:border-none">
+                                  <td className="py-2.5 font-bold text-slate-200">{job.company}</td>
+                                  <td className="py-2.5 text-slate-300">{job.role}</td>
+                                  <td className="py-2.5">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                      job.status === "Interviewing" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                                      job.status === "Applied" ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20" :
+                                      "bg-red-500/10 text-red-400 border border-red-500/20"
+                                    }`}>
+                                      {job.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-2.5 text-slate-400">{job.date}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Add Application Form inline */}
+                        <form onSubmit={handleAddJobTracker} className="mt-4 flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Company"
+                            value={newJobForm.company}
+                            onChange={(e) => setNewJobForm({ ...newJobForm, company: e.target.value })}
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            required
+                          />
+                          <input
+                            type="text"
+                            placeholder="Role"
+                            value={newJobForm.role}
+                            onChange={(e) => setNewJobForm({ ...newJobForm, role: e.target.value })}
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            required
+                          />
+                          <select
+                            value={newJobForm.status}
+                            onChange={(e) => setNewJobForm({ ...newJobForm, status: e.target.value })}
+                            className="bg-[#0b051e] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-purple-500"
                           >
-                            <defs>
-                              <linearGradient id="colorTech" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                              </linearGradient>
-                              <linearGradient id="colorAnalytics" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                              </linearGradient>
-                            </defs>
-                            <XAxis dataKey="name" stroke="#475569" fontSize={11} />
-                            <YAxis stroke="#475569" fontSize={11} />
-                            <Tooltip contentStyle={{ backgroundColor: "#0b051e", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px" }} />
-                            <Area type="monotone" dataKey="Tech" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#colorTech)" />
-                            <Area type="monotone" dataKey="Analytics" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorAnalytics)" />
-                          </AreaChart>
-                        </ResponsiveContainer>
+                            <option value="Applied">Applied</option>
+                            <option value="Interviewing">Interviewing</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-semibold transition-colors flex items-center gap-1"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Log
+                          </button>
+                        </form>
                       </div>
                     </div>
                   </motion.div>
@@ -1422,6 +2066,515 @@ export default function CareerCounsellor() {
                   </motion.div>
                 )}
 
+                {/* AI STUDY PLANNER VIEW */}
+                {activeTab === "study-planner" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-6 text-left"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="text-2xl font-bold">AI Study Planner</h3>
+                        <p className="text-xs text-slate-400">Weekly structured milestones powered by CareerVerse AI engine.</p>
+                      </div>
+                      <button
+                        onClick={handleAdaptiveReschedule}
+                        className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-semibold transition-all active:scale-95 flex items-center gap-1.5"
+                      >
+                        <Activity className="w-3.5 h-3.5" /> Adaptive Reschedule
+                      </button>
+                    </div>
+
+                    {adaptiveMessage && (
+                      <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-300 text-xs font-bold animate-pulse">
+                        {adaptiveMessage}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="glass-panel border-white/5 p-5 rounded-2xl md:col-span-2 flex flex-col gap-4">
+                        <h4 className="text-sm font-bold border-b border-white/5 pb-2">Weekly Schedule</h4>
+                        <div className="flex flex-col gap-3">
+                          {studyMissions.map((item, idx) => (
+                            <div key={idx} className="p-4 rounded-xl border border-white/5 bg-white/2 flex items-center justify-between">
+                              <div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-pink-400 block mb-1">{item.day}</span>
+                                <span className="text-xs font-bold text-slate-200">{item.task}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  item.completed ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                                }`}>
+                                  {item.completed ? "Completed" : "Pending"}
+                                </span>
+                                <button
+                                  onClick={() => {
+                                    const updated = [...studyMissions];
+                                    updated[idx].completed = !updated[idx].completed;
+                                    setStudyMissions(updated);
+                                  }}
+                                  className="p-1.5 rounded-lg border border-white/5 hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-colors"
+                                >
+                                  {item.completed ? <CheckSquare className="w-4 h-4 text-purple-400" /> : <Square className="w-4 h-4" />}
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-6">
+                        {/* Motivation widget */}
+                        <div className="glass-panel border-white/5 p-5 rounded-2xl">
+                          <h4 className="text-sm font-bold mb-2">AI Copilot Tip</h4>
+                          <p className="text-xs text-slate-400 leading-relaxed">
+                            "Hey Akash, you completed 2 out of 7 tasks this week. Your consistency index is 88%. Solve your Leetcode Tree question tomorrow to hit your 90% Readiness target!"
+                          </p>
+                        </div>
+
+                        {/* Calendar visual */}
+                        <div className="glass-panel border-white/5 p-5 rounded-2xl flex flex-col gap-4">
+                          <h4 className="text-sm font-bold border-b border-white/5 pb-2">Calendar Milestones</h4>
+                          <div className="flex items-center gap-3 text-xs text-slate-300">
+                            <span className="w-2 h-2 rounded-full bg-purple-500" />
+                            <span>Vercel Interview prep - Aug 4</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-slate-300">
+                            <span className="w-2 h-2 rounded-full bg-pink-500" />
+                            <span>System Design mock - Aug 8</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* PORTFOLIO BUILDER VIEW */}
+                {activeTab === "portfolio-builder" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-6 text-left"
+                  >
+                    <div>
+                      <h3 className="text-2xl font-bold">AI Portfolio Builder</h3>
+                      <p className="text-xs text-slate-400">Generate a hostable, interactive portfolio based on your goals and achievements.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Left: Input Fields */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl flex flex-col gap-4">
+                        <h4 className="text-sm font-bold border-b border-white/5 pb-2">Portfolio Information</h4>
+                        <div className="flex flex-col gap-3">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs text-slate-400 font-bold">Theme styling</label>
+                            <select
+                              value={portfolioData.theme}
+                              onChange={(e) => setPortfolioData({ ...portfolioData, theme: e.target.value })}
+                              className="bg-[#0b051e] border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            >
+                              <option value="Dark Neon">Dark Neon</option>
+                              <option value="Glassmorphism Premium">Glassmorphism Premium</option>
+                              <option value="Minimalist Cyberpunk">Minimalist Cyberpunk</option>
+                            </select>
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs text-slate-400 font-bold">Profession Title</label>
+                            <input
+                              type="text"
+                              value={portfolioData.title}
+                              onChange={(e) => setPortfolioData({ ...portfolioData, title: e.target.value })}
+                              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs text-slate-400 font-bold">Short Bio</label>
+                            <textarea
+                              rows={3}
+                              value={portfolioData.bio}
+                              onChange={(e) => setPortfolioData({ ...portfolioData, bio: e.target.value })}
+                              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs text-slate-400 font-bold">Skills List</label>
+                            <input
+                              type="text"
+                              value={portfolioData.skills}
+                              onChange={(e) => setPortfolioData({ ...portfolioData, skills: e.target.value })}
+                              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs text-slate-400 font-bold">Featured Projects</label>
+                            <input
+                              type="text"
+                              value={portfolioData.projects}
+                              onChange={(e) => setPortfolioData({ ...portfolioData, projects: e.target.value })}
+                              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <button
+                            onClick={() => {
+                              setPortfolioGenerated(true);
+                              // Increment readiness score slightly on generating portfolio
+                              if (user) {
+                                setUser({ ...user, readinessScore: Math.min(100, user.readinessScore + 2) });
+                              }
+                            }}
+                            className="w-full mt-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-semibold transition-colors text-center text-white cursor-pointer"
+                          >
+                            Update & Render Portfolio Live
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Right: Live Preview Container */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-sm font-bold border-b border-white/5 pb-2 mb-4">Interactive Live Preview</h4>
+                          <div className={`p-6 rounded-xl border border-purple-500/30 bg-slate-950/40 text-left min-h-[300px] flex flex-col justify-between relative overflow-hidden ${
+                            portfolioData.theme === "Dark Neon" ? "shadow-2xl shadow-purple-500/5" : "backdrop-blur-xl"
+                          }`}>
+                            <div className="absolute top-2 right-3 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                              <span className="text-[8px] text-slate-500 uppercase tracking-widest font-black">Live on Web</span>
+                            </div>
+                            
+                            <div>
+                              <h2 className="text-xl font-extrabold text-white">{portfolioData.name}</h2>
+                              <p className="text-xs text-purple-400 font-bold uppercase tracking-wider mt-0.5">{portfolioData.title}</p>
+                              <p className="text-xs text-slate-400 leading-relaxed mt-4">{portfolioData.bio}</p>
+
+                              <div className="mt-4">
+                                <span className="text-[10px] text-slate-500 font-bold uppercase">Skills</span>
+                                <div className="flex flex-wrap gap-1.5 mt-1">
+                                  {portfolioData.skills.split(",").map((s, idx) => (
+                                    <span key={idx} className="px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-[9px] text-purple-300 font-medium">
+                                      {s.trim()}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="mt-4">
+                                <span className="text-[10px] text-slate-500 font-bold uppercase">Featured Projects</span>
+                                <div className="flex flex-wrap gap-1.5 mt-1">
+                                  {portfolioData.projects.split(",").map((p, idx) => (
+                                    <span key={idx} className="px-2 py-0.5 rounded bg-pink-500/10 border border-pink-500/20 text-[9px] text-pink-300 font-medium">
+                                      {p.trim()}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
+                              <span className="text-[8px] text-slate-500 font-semibold">{portfolioData.github}</span>
+                              <span className="text-[8px] text-slate-500 font-semibold">{portfolioData.linkedin}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => alert("Portfolio layout generated! PDF export downloaded.")}
+                          className="w-full mt-6 py-2 rounded-xl bg-pink-600 hover:bg-pink-700 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer text-white"
+                        >
+                          <Download className="w-3.5 h-3.5" /> Download Portfolio Site Bundle
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* AI INTERVIEW LAB VIEW */}
+                {activeTab === "interview-lab" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-6 text-left"
+                  >
+                    <div>
+                      <h3 className="text-2xl font-bold">AI Interview Lab</h3>
+                      <p className="text-xs text-slate-400">Mock simulation with audio/video feedback powered by Gemini models.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Left 2 cols: Interview simulation workspace */}
+                      <div className="lg:col-span-2 flex flex-col gap-6">
+                        {/* Simulated webcam feedback box */}
+                        <div className="relative w-full h-80 rounded-2xl bg-gradient-to-br from-slate-900 via-[#0d0728] to-slate-950 border border-white/5 flex flex-col items-center justify-center overflow-hidden shadow-2xl">
+                          {/* Live signal indicator */}
+                          <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px] font-bold">
+                            <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                            <span>Simulated Camera & Voice Input: ACTIVE</span>
+                          </div>
+
+                          {simulatedVideoState ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950/80 relative">
+                              {/* Avatar placeholder that bounces or reacts */}
+                              <div className="w-24 h-24 rounded-full border-4 border-pink-500 bg-pink-500/20 flex items-center justify-center animate-pulse">
+                                <User className="w-12 h-12 text-pink-300" />
+                              </div>
+                              <span className="text-xs text-slate-300 font-bold mt-4">Analyzing facial composure and direct focus...</span>
+                              <button
+                                onClick={() => setSimulatedVideoState(false)}
+                                className="absolute bottom-4 right-4 p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold flex items-center gap-1"
+                              >
+                                <VideoOff className="w-3.5 h-3.5" /> Stop Camera
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-slate-400">
+                                <VideoOff className="w-8 h-8" />
+                              </div>
+                              <span className="text-xs text-slate-400">Webcam stream is currently disabled.</span>
+                              <button
+                                onClick={() => setSimulatedVideoState(true)}
+                                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-semibold flex items-center gap-1.5 mt-2 text-white cursor-pointer"
+                              >
+                                <Video className="w-4 h-4" /> Enable Camera Simulation
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Interactive Questionnaire flow */}
+                        <div className="glass-panel border-white/5 p-6 rounded-2xl">
+                          {interviewStep === "setup" && (
+                            <div className="flex flex-col items-center gap-6 py-8 text-center max-w-md mx-auto">
+                              <h4 className="text-lg font-bold">Configure Simulator</h4>
+                              <p className="text-xs text-slate-400">Select a career track directory path to focus the interview.</p>
+                              
+                              <div className="grid grid-cols-2 gap-3 w-full">
+                                {(["Behavioral", "Coding", "HR", "System Design"] as const).map((track) => (
+                                  <button
+                                    key={track}
+                                    onClick={() => setInterviewTrack(track)}
+                                    className={`py-3 px-4 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                                      interviewTrack === track ? "bg-purple-600 border-purple-500 text-white" : "bg-white/3 border-white/5 text-slate-400 hover:bg-white/5"
+                                    }`}
+                                  >
+                                    {track}
+                                  </button>
+                                ))}
+                              </div>
+
+                              <button
+                                onClick={() => {
+                                  setInterviewStep("simulating");
+                                  setCurrentQuestionIndex(0);
+                                  setUserInterviewAnswer("");
+                                }}
+                                className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 font-semibold text-xs text-white transition-all hover:shadow-lg active:scale-95 cursor-pointer"
+                              >
+                                Start Interactive Simulation
+                              </button>
+                            </div>
+                          )}
+
+                          {interviewStep === "simulating" && (
+                            <div className="flex flex-col gap-4 text-left">
+                              <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
+                                <span className="text-xs text-pink-400 font-bold uppercase tracking-wider">{interviewTrack} Interview</span>
+                                <span className="text-xs text-slate-500 font-semibold">Q {currentQuestionIndex + 1} of 3</span>
+                              </div>
+
+                              <p className="text-sm text-slate-200 font-semibold mb-4 leading-relaxed">
+                                "{interviewQuestions[interviewTrack][currentQuestionIndex]}"
+                              </p>
+
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-xs text-slate-400 font-bold">Your Response (Type or use voice dictation)</label>
+                                <div className="relative w-full">
+                                  <textarea
+                                    rows={4}
+                                    placeholder="Type your response here..."
+                                    value={userInterviewAnswer}
+                                    onChange={(e) => setUserInterviewAnswer(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 outline-none focus:border-purple-500 transition-all text-xs text-slate-100 placeholder-slate-500 pr-12"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setUserInterviewAnswer("Based on my experiences, I handled this obstacle by building automated unit tests, leading the engineering scrum meetings, and working directly on deployment issues...")}
+                                    className="absolute bottom-4 right-4 p-2 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-400 transition-all"
+                                    title="Simulate Voice Input"
+                                  >
+                                    <Mic className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-between items-center mt-4">
+                                <button
+                                  onClick={() => setInterviewStep("setup")}
+                                  className="text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
+                                >
+                                  <ArrowLeft className="w-3.5 h-3.5" /> Back
+                                </button>
+                                <button
+                                  onClick={handleSendInterviewAnswer}
+                                  className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-bold text-white transition-colors cursor-pointer"
+                                >
+                                  {currentQuestionIndex < 2 ? "Next Question" : "Complete & Analyze"}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {interviewStep === "feedback" && (
+                            <div className="flex flex-col gap-6 text-left">
+                              <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-2">
+                                <span className="text-xs text-green-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> Analysis Complete
+                                </span>
+                                <button
+                                  onClick={() => setInterviewStep("setup")}
+                                  className="text-xs text-purple-400 hover:underline font-bold cursor-pointer"
+                                >
+                                  Restart Simulation
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="p-4 rounded-xl bg-white/2 border border-white/5">
+                                  <span className="text-[10px] text-slate-500 font-bold uppercase block mb-1">Articulation Score</span>
+                                  <span className="text-2xl font-black text-white">{aiInterviewFeedback.confidenceScore}%</span>
+                                  <p className="text-[9px] text-slate-400 mt-2">{aiInterviewFeedback.commAnalysis}</p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-white/2 border border-white/5">
+                                  <span className="text-[10px] text-slate-500 font-bold uppercase block mb-1">Eye Contact Rate</span>
+                                  <span className="text-2xl font-black text-white">{aiInterviewFeedback.eyeContactRating}</span>
+                                  <p className="text-[9px] text-slate-400 mt-2">Stability of focus: High, direct alignment verified.</p>
+                                </div>
+                              </div>
+
+                              <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10">
+                                <span className="text-[10px] text-purple-400 font-bold uppercase block mb-1">STAR Review</span>
+                                <p className="text-xs text-slate-300 leading-relaxed font-semibold">{aiInterviewFeedback.answerQuality}</p>
+                              </div>
+
+                              <div className="p-4 rounded-xl bg-pink-500/5 border border-pink-500/10">
+                                <span className="text-[10px] text-pink-400 font-bold uppercase block mb-1">Improvement Tips</span>
+                                <p className="text-xs text-slate-300 leading-relaxed font-semibold">{aiInterviewFeedback.improvementTips}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right col: Interview history logs */}
+                      <div className="glass-panel border-white/5 p-6 rounded-2xl flex flex-col gap-4">
+                        <h4 className="text-sm font-bold border-b border-white/5 pb-2">Simulation Logs</h4>
+                        <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto">
+                          {user.interviewHistory.map((item, idx) => (
+                            <div key={idx} className="p-3.5 rounded-xl border border-white/5 bg-white/2 text-xs flex flex-col gap-1.5">
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold text-slate-200">{item.role}</span>
+                                <span className="text-[9px] text-slate-500 font-bold uppercase">{item.date}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-purple-400 font-bold">{item.type}</span>
+                                <span className="text-green-400 font-bold">Score: {item.score}%</span>
+                              </div>
+                              <p className="text-[10px] text-slate-400 leading-relaxed mt-1 italic">
+                                "{item.feedback}"
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* COMMUNITY HUB VIEW */}
+                {activeTab === "community" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-6 text-left"
+                  >
+                    <div>
+                      <h3 className="text-2xl font-bold">Community Hub</h3>
+                      <p className="text-xs text-slate-400">Share learning milestones, hackathon requests, and collaborate with peers.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      {/* Left: Feed */}
+                      <div className="lg:col-span-2 flex flex-col gap-4">
+                        {/* Create Post Form */}
+                        <form onSubmit={handleCreatePost} className="glass-panel border-white/5 p-5 rounded-2xl flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Share an accomplishment or course completion..."
+                            value={newPostText}
+                            onChange={(e) => setNewPostText(e.target.value)}
+                            className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-purple-500 placeholder-slate-500"
+                          />
+                          <button
+                            type="submit"
+                            className="px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-xs font-semibold text-white transition-colors cursor-pointer"
+                          >
+                            Post
+                          </button>
+                        </form>
+
+                        {/* Feed list */}
+                        <div className="flex flex-col gap-4">
+                          {communityPosts.map((post) => (
+                            <div key={post.id} className="glass-panel border-white/5 p-5 rounded-2xl flex flex-col gap-3">
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-[10px] font-bold text-purple-300">
+                                    {post.author[0]}
+                                  </div>
+                                  <div className="text-left">
+                                    <span className="text-xs font-bold text-slate-200 block leading-none">{post.author}</span>
+                                    <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5">{post.role}</span>
+                                  </div>
+                                </div>
+                                <span className="text-[10px] text-slate-500">{post.date}</span>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed font-semibold mt-2">{post.text}</p>
+                              
+                              <div className="flex items-center gap-4 mt-2 pt-3 border-t border-white/5 text-[10px] text-slate-500 font-bold">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setCommunityPosts(communityPosts.map(p => {
+                                      if (p.id === post.id) return { ...p, likes: p.likes + 1 };
+                                      return p;
+                                    }));
+                                  }}
+                                  className="hover:text-purple-400 transition-colors flex items-center gap-1 cursor-pointer"
+                                >
+                                  👍 {post.likes} Likes
+                                </button>
+                                <span>💬 {post.comments} Comments</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Right: Channels/Stats */}
+                      <div className="flex flex-col gap-6">
+                        <div className="glass-panel border-white/5 p-5 rounded-2xl">
+                          <h4 className="text-xs font-bold border-b border-white/5 pb-2 mb-3 uppercase tracking-wider text-slate-400">Active Channels</h4>
+                          <div className="flex flex-col gap-2">
+                            <span className="text-xs text-slate-300 hover:text-purple-400 cursor-pointer">#general-discussions</span>
+                            <span className="text-xs text-slate-300 hover:text-purple-400 cursor-pointer">#hackathon-matchmaking</span>
+                            <span className="text-xs text-slate-300 hover:text-purple-400 cursor-pointer">#resume-critique</span>
+                            <span className="text-xs text-slate-300 hover:text-purple-400 cursor-pointer">#interview-prep-study</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* F. ADMIN CONSOLE VIEW */}
                 {activeTab === "admin" && user?.role === "admin" && (
                   <motion.div
@@ -1850,6 +3003,188 @@ export default function CareerCounsellor() {
                   </div>
                 </div>
               )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* D. Command Palette Overlay */}
+      <AnimatePresence>
+        {commandPaletteOpen && (
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/70 backdrop-blur-md"
+              onClick={() => setCommandPaletteOpen(false)}
+            />
+            <motion.div
+              initial={{ scale: 0.97, y: -10, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.97, y: -10, opacity: 0 }}
+              className="relative w-full max-w-lg glass-panel border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 flex flex-col"
+            >
+              {/* Search Bar */}
+              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5 bg-white/2">
+                <Search className="w-4 h-4 text-purple-400" />
+                <input
+                  type="text"
+                  placeholder="Search modules, roadmaps, skills..."
+                  value={commandQuery}
+                  onChange={(e) => setCommandQuery(e.target.value)}
+                  className="flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder-slate-500"
+                  autoFocus
+                />
+                <span className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-slate-400 font-bold">ESC</span>
+              </div>
+
+              {/* Suggestions / Options */}
+              <div className="flex flex-col p-2 max-h-72 overflow-y-auto text-left">
+                {[
+                  { name: "Go to Career OS Dashboard", tab: "dashboard", desc: "View readiness score & daily missions" },
+                  { name: "Predict Career Role", tab: "predictor", desc: "Take structured career path assessments" },
+                  { name: "Review ATS Resume", tab: "resume", desc: "Upload and analyze resume compatibility" },
+                  { name: "Generate Learning Roadmap", tab: "roadmap", desc: "Milestones for targeted career trajectories" },
+                  { name: "Open AI Study Planner", tab: "study-planner", desc: "Weekly milestones & adaptive schedule" },
+                  { name: "Start Mock Interview Lab", tab: "interview-lab", desc: "Interactive speech & composure mockups" },
+                  { name: "Customize Portfolio Website", tab: "portfolio-builder", desc: "Interactive dark neon layout builder" },
+                  { name: "Browse Community Hub", tab: "community", desc: "Collaborate on projects & hackathons" }
+                ]
+                  .filter(item => item.name.toLowerCase().includes(commandQuery.toLowerCase()) || item.desc.toLowerCase().includes(commandQuery.toLowerCase()))
+                  .map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setActiveTab(item.tab as any);
+                        setCommandPaletteOpen(false);
+                      }}
+                      className="w-full text-left p-3 rounded-xl hover:bg-purple-600/10 hover:border-purple-500/25 border border-transparent transition-all flex justify-between items-center group cursor-pointer"
+                    >
+                      <div>
+                        <span className="text-xs font-bold text-slate-200 block group-hover:text-purple-400 transition-colors">{item.name}</span>
+                        <span className="text-[10px] text-slate-500 mt-0.5 block">{item.desc}</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-purple-400 transition-colors" />
+                    </button>
+                  ))}
+              </div>
+
+              {/* Palette Footer */}
+              <div className="px-4 py-2 border-t border-white/5 bg-white/2 text-[9px] text-slate-500 font-semibold text-left">
+                Tip: Press <kbd className="font-bold">Ctrl + K</kbd> anywhere to trigger Command Search.
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* E. Floating AI Copilot Drawer Overlay */}
+      <AnimatePresence>
+        {copilotOpen && (
+          <div className="fixed inset-0 z-50 flex justify-end">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setCopilotOpen(false)}
+            />
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="relative w-full max-w-md h-full bg-[#0a041c] border-l border-white/10 shadow-2xl p-6 flex flex-col justify-between z-10"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-3 h-3 rounded-full bg-purple-500 animate-ping" />
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-100 flex items-center gap-1">
+                      <Sparkles className="w-4 h-4 text-purple-400" /> CareerVerse Copilot
+                    </h4>
+                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-black block mt-0.5">Interactive Mentorship</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setCopilotOpen(false)}
+                  className="p-1.5 rounded-lg border border-white/5 hover:bg-white/5 text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Chat messages */}
+              <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4 mb-4">
+                {copilotMessages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex flex-col max-w-[85%] ${
+                      msg.role === "user" ? "self-end items-end" : "self-start items-start"
+                    }`}
+                  >
+                    <div
+                      className={`px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed text-left ${
+                        msg.role === "user"
+                          ? "bg-purple-600 text-white rounded-tr-none"
+                          : "bg-white/5 border border-white/10 text-slate-200 rounded-tl-none"
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                    <span className="text-[9px] text-slate-600 mt-1 uppercase font-semibold tracking-wider">
+                      {msg.role === "user" ? "You" : "Copilot"}
+                    </span>
+                  </div>
+                ))}
+                {copilotLoading && (
+                  <div className="self-start flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-2.5 rounded-2xl rounded-tl-none">
+                    <div className="w-1 h-1 rounded-full bg-slate-400 animate-bounce"></div>
+                    <div className="w-1 h-1 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                    <div className="w-1 h-1 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+                  </div>
+                )}
+                <div ref={copilotEndRef} />
+              </div>
+
+              {/* Quick suggestion tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleSendCopilotSuggestion("Suggest an adaptive daily mission based on my goals.")}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-slate-300 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all cursor-pointer"
+                >
+                  💡 Get Daily Mission
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSendCopilotSuggestion("How can I improve my Career Readiness Score from " + (user?.readinessScore || 78) + "%?")}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] text-slate-300 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all cursor-pointer"
+                >
+                  📈 Boost Readiness
+                </button>
+              </div>
+
+              {/* Input box */}
+              <form onSubmit={handleSendCopilotMessage} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Ask your Copilot anything..."
+                  value={copilotInput}
+                  onChange={(e) => setCopilotInput(e.target.value)}
+                  className="flex-grow bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-purple-500 placeholder-slate-500"
+                />
+                <button
+                  type="submit"
+                  className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white transition-colors cursor-pointer"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </form>
             </motion.div>
           </div>
         )}
