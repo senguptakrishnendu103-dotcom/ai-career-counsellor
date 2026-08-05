@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/context/AuthContext";
-import AuthControls from "@/components/AuthControls";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -28,10 +27,7 @@ export default function RootLayout({
           <div className="aurora-blur aurora-2"></div>
           <div className="aurora-blur aurora-3"></div>
         </div>
-        <AuthProvider>
-          <AuthControls />
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

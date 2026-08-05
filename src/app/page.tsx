@@ -136,120 +136,128 @@ export default function CareerCounsellor() {
   // Auth state
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
-  const [user, setUser] = useState<UserProfile | null>({
-    name: "Akash Sengupta",
-    email: "akash@example.com",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=60",
-    streak: 5,
-    role: "user",
-    savedCareers: ["AI Research Scientist", "Product Designer"],
-    assessmentHistory: [
-      { date: "2026-07-28", result: "Software Engineer" },
-      { date: "2026-07-30", result: "AI Research Scientist" }
-    ],
-    completedSteps: 12,
-    totalSteps: 20,
-    goals: ["Get a remote AI Software Engineer job", "Build an open-source React library", "Pass AWS Solutions Architect certification"],
-    skills: ["React/Next.js", "TypeScript", "Python", "Tailwind CSS", "REST APIs"],
-    weakAreas: ["System Design", "Algorithms & Data Structures", "Public Speaking"],
-    certifications: ["AWS Certified Cloud Practitioner", "Google Data Analytics Professional Cert"],
-    readinessScore: 78,
-    confidenceScore: 82,
-    weeklyProgress: [40, 60, 45, 80, 50, 90, 70],
-    placementReady: true,
-    trackerJobs: [
-      { company: "Vercel", role: "Junior Frontend Engineer", status: "Applied", date: "2026-07-28" },
-      { company: "Stripe", role: "Software Engineer Intern", status: "Interviewing", date: "2026-07-25" },
-      { company: "Linear", role: "Product Engineer", status: "Rejected", date: "2026-07-15" }
-    ],
-    studyHours: 18,
-    consistencyScore: 88,
-    completionPercentage: 68,
-    missions: [
-      { id: 1, task: "Complete Next.js routing course module", completed: true },
-      { id: 2, task: "Upload and analyze resume with ATS reviewer", completed: true },
-      { id: 3, task: "Practice one AI behavioral interview session", completed: false }
-    ],
-    interviewHistory: [
-      { role: "Frontend Developer", type: "Technical", date: "2026-07-29", score: 85, feedback: "Great React knowledge. Needs slight improvement in CSS grid/flexbox edge cases." },
-      { role: "Software Engineer", type: "HR", date: "2026-07-26", score: 92, feedback: "Excellent communication skills and strong alignment with company values." }
-    ]
-  });
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  // Helper: build a fresh UserProfile from a Supabase User object + optional profile row
+  const buildUserProfile = (sbUser: any, profileRow?: any): UserProfile => {
+    const meta = sbUser.user_metadata || {};
+    if (profileRow) {
+      // If a profiles-table row exists, use it (spread keeps all persisted fields)
+      return {
+        name: profileRow.name || meta.name || sbUser.email?.split("@")[0] || "User",
+        email: profileRow.email || sbUser.email || "",
+        avatar: profileRow.avatar || meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${meta.name || sbUser.email}`,
+        streak: profileRow.streak ?? 0,
+        role: profileRow.role || (sbUser.email?.includes("admin") ? "admin" : "user"),
+        savedCareers: profileRow.savedCareers ?? [],
+        assessmentHistory: profileRow.assessmentHistory ?? [],
+        completedSteps: profileRow.completedSteps ?? 0,
+        totalSteps: profileRow.totalSteps ?? 15,
+        goals: profileRow.goals ?? [],
+        skills: profileRow.skills ?? [],
+        weakAreas: profileRow.weakAreas ?? [],
+        certifications: profileRow.certifications ?? [],
+        readinessScore: profileRow.readinessScore ?? 50,
+        confidenceScore: profileRow.confidenceScore ?? 50,
+        weeklyProgress: profileRow.weeklyProgress ?? [0, 0, 0, 0, 0, 0, 0],
+        placementReady: profileRow.placementReady ?? false,
+        trackerJobs: profileRow.trackerJobs ?? [],
+        studyHours: profileRow.studyHours ?? 0,
+        consistencyScore: profileRow.consistencyScore ?? 0,
+        completionPercentage: profileRow.completionPercentage ?? 0,
+        missions: profileRow.missions ?? [
+          { id: 1, task: "Complete your first career assessment", completed: false },
+          { id: 2, task: "Upload and analyze your resume", completed: false },
+          { id: 3, task: "Practice an AI interview session", completed: false }
+        ],
+        interviewHistory: profileRow.interviewHistory ?? []
+      };
+    }
+    // No profile row — build defaults from auth metadata
+    return {
+      name: meta.name || sbUser.email?.split("@")[0] || "User",
+      email: sbUser.email || "",
+      avatar: meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${meta.name || sbUser.email}`,
+      streak: 0,
+      role: sbUser.email?.includes("admin") ? "admin" : "user",
+      savedCareers: [],
+      assessmentHistory: [],
+      completedSteps: 0,
+      totalSteps: 15,
+      goals: [],
+      skills: [],
+      weakAreas: [],
+      certifications: [],
+      readinessScore: 50,
+      confidenceScore: 50,
+      weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
+      placementReady: false,
+      trackerJobs: [],
+      studyHours: 0,
+      consistencyScore: 0,
+      completionPercentage: 0,
+      missions: [
+        { id: 1, task: "Complete your first career assessment", completed: false },
+        { id: 2, task: "Upload and analyze your resume", completed: false },
+        { id: 3, task: "Practice an AI interview session", completed: false }
+      ],
+      interviewHistory: []
+    };
+  };
 
   const [authForm, setAuthForm] = useState({ name: "", email: "", password: "" });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (supabase) {
-      if (authMode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email: authForm.email,
-          password: authForm.password,
-          options: {
-            data: {
-              name: authForm.name || "Akash Sengupta"
-            }
+    if (authMode === "signup") {
+      const { error } = await supabase.auth.signUp({
+        email: authForm.email,
+        password: authForm.password,
+        options: {
+          data: {
+            name: authForm.name || "User"
           }
-        });
-        if (error) {
-          alert("Sign up error: " + error.message);
-          return;
         }
-        alert("Registration successful! Check your email for verification link, or log in if your instance skips verification.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: authForm.email,
-          password: authForm.password
-        });
-        if (error) {
-          alert("Sign in error: " + error.message);
-          return;
-        }
+      });
+      if (error) {
+        alert("Sign up error: " + error.message);
+        return;
       }
-      setAuthModalOpen(false);
-      setActiveTab("dashboard");
+      alert("Registration successful! Check your email for a verification link, then log in.");
+      setAuthMode("login");
       return;
     }
 
-    const userData = {
-      name: authForm.name || "Akash Sengupta",
-      email: authForm.email || "akash@example.com",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=60",
-      streak: 1,
-      role: (authForm.email.includes("admin") ? "admin" : "user") as "user" | "admin",
-      savedCareers: [],
-      assessmentHistory: [],
-      completedSteps: 0,
-      totalSteps: 15,
-      goals: ["Get a remote AI Software Engineer job", "Build an open-source React library", "Pass AWS Solutions Architect certification"],
-      skills: ["React/Next.js", "TypeScript", "Python", "Tailwind CSS", "REST APIs"],
-      weakAreas: ["System Design", "Algorithms & Data Structures", "Public Speaking"],
-      certifications: ["AWS Certified Cloud Practitioner", "Google Data Analytics Professional Cert"],
-      readinessScore: 78,
-      confidenceScore: 82,
-      weeklyProgress: [40, 60, 45, 80, 50, 90, 70],
-      placementReady: true,
-      trackerJobs: [
-        { company: "Vercel", role: "Junior Frontend Engineer", status: "Applied", date: "2026-07-28" },
-        { company: "Stripe", role: "Software Engineer Intern", status: "Interviewing", date: "2026-07-25" },
-        { company: "Linear", role: "Product Engineer", status: "Rejected", date: "2026-07-15" }
-      ],
-      studyHours: 18,
-      consistencyScore: 88,
-      completionPercentage: 68,
-      missions: [
-        { id: 1, task: "Complete Next.js routing course module", completed: true },
-        { id: 2, task: "Upload and analyze resume with ATS reviewer", completed: true },
-        { id: 3, task: "Practice one AI behavioral interview session", completed: false }
-      ],
-      interviewHistory: [
-        { role: "Frontend Developer", type: "Technical", date: "2026-07-29", score: 85, feedback: "Great React knowledge. Needs slight improvement in CSS grid/flexbox edge cases." },
-        { role: "Software Engineer", type: "HR", date: "2026-07-26", score: 92, feedback: "Excellent communication skills and strong alignment with company values." }
-      ]
-    };
-    setUser(userData);
-    localStorage.setItem("careerverse_user", JSON.stringify(userData));
+    // Login flow
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: authForm.email,
+      password: authForm.password
+    });
+    if (error) {
+      alert("Sign in error: " + error.message);
+      return;
+    }
+
+    // Build user profile from the authenticated session
+    if (data.user) {
+      // Try to fetch profile row from Supabase (will fail silently if table doesn't exist yet)
+      let profileRow: any = null;
+      try {
+        const { data: row } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", data.user.id)
+          .single();
+        profileRow = row;
+      } catch (_) { /* profiles table may not exist yet */ }
+
+      const profile = buildUserProfile(data.user, profileRow);
+      setUser(profile);
+      localStorage.setItem("careerverse_user", JSON.stringify(profile));
+    }
+
+    setAuthForm({ name: "", email: "", password: "" });
     setAuthModalOpen(false);
     setActiveTab("dashboard");
   };
@@ -728,51 +736,67 @@ export default function CareerCounsellor() {
     let unsubscribe: (() => void) | undefined;
 
     const checkSession = async () => {
-      const supabaseClient = supabase;
-      if (supabaseClient) {
-        try {
-          const { data: { session } } = await supabaseClient.auth.getSession();
-          if (session?.user) {
-            const { data: profile } = await supabaseClient
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          // Try to load profile row; fall back to auth metadata
+          let profileRow: any = null;
+          try {
+            const { data: row } = await supabase
               .from("profiles")
               .select("*")
               .eq("id", session.user.id)
               .single();
-            if (profile) {
-              setUser(profile as any);
+            profileRow = row;
+          } catch (_) { /* profiles table may not exist yet */ }
+
+          const profile = buildUserProfile(session.user, profileRow);
+          setUser(profile);
+          setActiveTab("dashboard");
+        } else {
+          // No active Supabase session — try localStorage
+          const savedUser = localStorage.getItem("careerverse_user");
+          if (savedUser) {
+            try {
+              setUser(JSON.parse(savedUser));
               setActiveTab("dashboard");
-            }
+            } catch (_) { /* corrupt data */ }
           }
-          
-          const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session?.user) {
-              const { data: profile } = await supabaseClient
+        }
+
+        // Listen for future auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            let profileRow: any = null;
+            try {
+              const { data: row } = await supabase
                 .from("profiles")
                 .select("*")
                 .eq("id", session.user.id)
                 .single();
-              if (profile) {
-                setUser(profile as any);
-                setActiveTab("dashboard");
-              }
-            } else if (event === "SIGNED_OUT") {
-              setUser(null);
-              setActiveTab("landing");
-            }
-          });
-          unsubscribe = () => subscription.unsubscribe();
-        } catch (err) {
-          console.error("Supabase session load error, falling back:", err);
-        }
-      } else {
+              profileRow = row;
+            } catch (_) { /* profiles table may not exist */ }
+
+            const profile = buildUserProfile(session.user, profileRow);
+            setUser(profile);
+            localStorage.setItem("careerverse_user", JSON.stringify(profile));
+            setActiveTab("dashboard");
+          } else if (event === "SIGNED_OUT") {
+            setUser(null);
+            localStorage.removeItem("careerverse_user");
+            setActiveTab("landing");
+          }
+        });
+        unsubscribe = () => subscription.unsubscribe();
+      } catch (err) {
+        console.error("Supabase session load error, falling back to localStorage:", err);
+        // Final fallback: localStorage
         const savedUser = localStorage.getItem("careerverse_user");
         if (savedUser) {
           try {
             setUser(JSON.parse(savedUser));
             setActiveTab("dashboard");
-          } catch (err) {
-            console.error("Error reading saved user session:", err);
-          }
+          } catch (_) { /* corrupt data */ }
         }
       }
     };
