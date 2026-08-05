@@ -238,7 +238,10 @@ export default function CareerCounsellor() {
         }
       });
       if (error) {
-        alert("Sign up error: " + error.message);
+        const msg = error.message?.includes("Failed to fetch")
+          ? "Failed to fetch: Unable to connect to Supabase. Make sure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are added to your Render Environment Variables."
+          : error.message;
+        alert("Sign up error: " + msg);
         return;
       }
       alert("Registration successful! Check your email for a verification link, then log in.");
@@ -252,7 +255,10 @@ export default function CareerCounsellor() {
       password: authForm.password
     });
     if (error) {
-      alert("Sign in error: " + error.message);
+      const msg = error.message?.includes("Failed to fetch")
+        ? "Failed to fetch: Unable to connect to Supabase. Make sure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are added to your Render Environment Variables."
+        : error.message;
+      alert("Sign in error: " + msg);
       return;
     }
 
