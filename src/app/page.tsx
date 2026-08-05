@@ -210,6 +210,23 @@ export default function CareerCounsellor() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (authMode === "forgot") {
+      if (!authForm.email) {
+        alert("Please enter your email address.");
+        return;
+      }
+      const { error } = await supabase.auth.resetPasswordForEmail(authForm.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        alert("Reset error: " + error.message);
+        return;
+      }
+      alert("Password reset link sent! Check your email inbox.");
+      setAuthMode("login");
+      return;
+    }
+
     if (authMode === "signup") {
       const { error } = await supabase.auth.signUp({
         email: authForm.email,
@@ -2894,7 +2911,7 @@ export default function CareerCounsellor() {
                 {authMode === "login" ? "Welcome Back" : authMode === "signup" ? "Get Started" : "Reset Password"}
               </h3>
               <p className="text-xs text-slate-500 mb-6">
-                {authMode === "login" ? "Enter credentials to unlock assessment tools" : "Sign up for a premium career dashboard"}
+                {authMode === "login" ? "Enter credentials to unlock assessment tools" : authMode === "signup" ? "Sign up for a premium career dashboard" : "Enter your email and we'll send a reset link"}
               </p>
 
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -2921,6 +2938,7 @@ export default function CareerCounsellor() {
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 text-slate-100 placeholder:text-slate-600"
                   />
                 </div>
+                {authMode !== "forgot" && (
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
                     <label className="text-xs text-slate-400 font-semibold">Password</label>
@@ -2942,12 +2960,13 @@ export default function CareerCounsellor() {
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 text-slate-100"
                   />
                 </div>
+                )}
 
                 <button
                   type="submit"
                   className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-semibold text-sm transition-colors mt-2 cursor-pointer"
                 >
-                  {authMode === "login" ? "Sign In" : "Register Account"}
+                  {authMode === "login" ? "Sign In" : authMode === "signup" ? "Register Account" : "Send Reset Link"}
                 </button>
               </form>
 
