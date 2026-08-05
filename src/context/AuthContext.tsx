@@ -1,0 +1,120 @@
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { supabase } from "@/lib/supabase";
+import type { Session, User } from "@supabase/supabase-js";
+
+// Types for role support – extend as needed
+export type Role = "student" | "mentor" | "admin";
+
+interface AuthContextProps {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  role: Role | null;
+  signUp: (
+    email: string,
+    password: string,
+    data?: Record<string, any>
+  ) => Promise<{ error?: any; user?: User }>; // data can include role, name, etc.
+  signIn: (email: string, password: string) => Promise<{ error?: any; user?: User }>;
+  signOut: () => Promise<{ error?: any }>;
+  resetPassword: (email: string) => Promise<{ error?: any }>;
+}
+
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return ctx;
+};
+
+interface ProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: ProviderProps) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [role, setRole] = useState<Role | null>(null);
+
+  // Initialize session from Supabase client and listen for changes
+  useEffect(() => {
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) console.warn("Supabase getSession error", error);
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      const r = data.session?.user?.app_metadata?.role as Role | undefined;
+      setRole(r ?? null);
+      setLoading(false);
+    };
+
+    getSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      const r = session?.user?.app_metadata?.role as Role | undefined;
+      setRole(r ?? null);
+    });
+
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  const signUp = async (
+    email: string,
+    password: string,
+    data: Record<string, any> = {}
+  ) => {
+    const { error, data: signUpData } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data },
+    });
+    if (error) return { error };
+    // After successful sign‑up, Supabase sends a verification email automatically.
+    return { user: signUpData.user ?? undefined };
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { error, data: signInData } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) return { error };
+    return { user: signInData.user };
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) return { error };
+    // local state will be cleared by the auth listener
+    return {};
+  };
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) return { error };
+    return {};
+  };
+
+  const value: AuthContextProps = {
+    user,
+    session,
+    loading,
+    role,
+    signUp,
+    signIn,
+    signOut,
+    resetPassword,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
