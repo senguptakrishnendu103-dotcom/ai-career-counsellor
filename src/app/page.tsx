@@ -216,13 +216,13 @@ export default function CareerCounsellor() {
         return;
       }
       const { error } = await supabase.auth.resetPasswordForEmail(authForm.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/reset-password`
       });
       if (error) {
-        alert("Reset error: " + error.message);
+        alert("Password reset error: " + error.message);
         return;
       }
-      alert("Password reset link sent! Check your email inbox.");
+      alert("Password reset link sent! Please check your email inbox.");
       setAuthMode("login");
       return;
     }
@@ -2911,7 +2911,11 @@ export default function CareerCounsellor() {
                 {authMode === "login" ? "Welcome Back" : authMode === "signup" ? "Get Started" : "Reset Password"}
               </h3>
               <p className="text-xs text-slate-500 mb-6">
-                {authMode === "login" ? "Enter credentials to unlock assessment tools" : authMode === "signup" ? "Sign up for a premium career dashboard" : "Enter your email and we'll send a reset link"}
+                {authMode === "login" 
+                  ? "Enter credentials to unlock assessment tools" 
+                  : authMode === "signup" 
+                  ? "Sign up for a premium career dashboard" 
+                  : "Enter your email address to receive a password reset link"}
               </p>
 
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -2934,32 +2938,32 @@ export default function CareerCounsellor() {
                     required
                     value={authForm.email}
                     onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="hint: 'admin@career.com' for admin dashboard"
+                    placeholder="name@example.com"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 text-slate-100 placeholder:text-slate-600"
                   />
                 </div>
                 {authMode !== "forgot" && (
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs text-slate-400 font-semibold">Password</label>
-                    {authMode === "login" && (
-                      <button
-                        type="button"
-                        onClick={() => setAuthMode("forgot")}
-                        className="text-[10px] text-purple-400 hover:underline"
-                      >
-                        Forgot?
-                      </button>
-                    )}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs text-slate-400 font-semibold">Password</label>
+                      {authMode === "login" && (
+                        <button
+                          type="button"
+                          onClick={() => setAuthMode("forgot")}
+                          className="text-[10px] text-purple-400 hover:underline"
+                        >
+                          Forgot?
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="password"
+                      required
+                      value={authForm.password}
+                      onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 text-slate-100"
+                    />
                   </div>
-                  <input
-                    type="password"
-                    required
-                    value={authForm.password}
-                    onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-500 text-slate-100"
-                  />
-                </div>
                 )}
 
                 <button
