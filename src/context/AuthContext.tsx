@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Session, User } from "@supabase/supabase-js";
@@ -14,7 +16,7 @@ interface AuthContextProps {
     email: string,
     password: string,
     data?: Record<string, any>
-  ) => Promise<{ error?: any; user?: User }>; // data can include role, name, etc.
+  ) => Promise<{ error?: any; user?: User }>;
   signIn: (email: string, password: string) => Promise<{ error?: any; user?: User }>;
   signOut: () => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
@@ -34,7 +36,7 @@ interface ProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: ProviderProps) => {
+const AuthProvider = ({ children }: ProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -43,18 +45,23 @@ export const AuthProvider = ({ children }: ProviderProps) => {
   // Initialize session from Supabase client and listen for changes
   useEffect(() => {
     const getSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) console.warn("Supabase getSession error", error);
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      const r = data.session?.user?.app_metadata?.role as Role | undefined;
-      setRole(r ?? null);
-      setLoading(false);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) console.warn("Supabase getSession error", error);
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+        const r = data.session?.user?.app_metadata?.role as Role | undefined;
+        setRole(r ?? null);
+      } catch (err) {
+        console.warn("Supabase session init failed:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       const r = session?.user?.app_metadata?.role as Role | undefined;
@@ -77,7 +84,6 @@ export const AuthProvider = ({ children }: ProviderProps) => {
       options: { data },
     });
     if (error) return { error };
-    // After successful sign‑up, Supabase sends a verification email automatically.
     return { user: signUpData.user ?? undefined };
   };
 
@@ -93,13 +99,14 @@ export const AuthProvider = ({ children }: ProviderProps) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) return { error };
-    // local state will be cleared by the auth listener
     return {};
   };
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: typeof window !== "undefined"
+        ? `${window.location.origin}/reset-password`
+        : undefined,
     });
     if (error) return { error };
     return {};
@@ -118,3 +125,5 @@ export const AuthProvider = ({ children }: ProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthProvider;

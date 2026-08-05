@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -8,8 +10,8 @@ interface AuthModalProps {
   setMode: (mode: "login" | "signup") => void;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) => {
-  const { signIn, signUp, resetPassword, loading, user } = useAuth();
+const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) => {
+  const { signIn, signUp, resetPassword, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -24,9 +26,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMo
     if (mode === "login") {
       const { error } = await signIn(email, password);
       if (error) setError(error.message ?? "Login failed");
+      else onClose();
     } else {
       const { error } = await signUp(email, password, { role, name });
-      if (error) setError(error.message ?? "Sign‑up failed");
+      if (error) setError(error.message ?? "Sign-up failed");
       else setInfo("Verification email sent. Please check your inbox.");
     }
   };
@@ -44,8 +47,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMo
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-xl bg-gray-900 p-6 shadow-lg">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="relative w-full max-w-md rounded-xl bg-gray-900 p-6 shadow-lg">
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 text-gray-400 hover:text-white text-xl leading-none"
+        >
+          ✕
+        </button>
         <h2 className="mb-4 text-center text-2xl font-semibold text-white">
           {mode === "login" ? "Log In" : "Sign Up"}
         </h2>
@@ -100,7 +109,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMo
         <div className="mt-4 flex justify-between text-sm text-gray-400">
           {mode === "login" ? (
             <p>
-              Don't have an account?{' '}
+              Don&apos;t have an account?{" "}
               <button
                 onClick={() => setMode("signup")}
                 className="underline hover:text-white"
@@ -110,7 +119,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMo
             </p>
           ) : (
             <p>
-              Already have an account?{' '}
+              Already have an account?{" "}
               <button
                 onClick={() => setMode("login")}
                 className="underline hover:text-white"
@@ -125,13 +134,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMo
             </button>
           )}
         </div>
-        <button
-          onClick={onClose}
-          className="absolute right-2 top-2 text-gray-400 hover:text-white"
-        >
-          ✕
-        </button>
       </div>
     </div>
   );
 };
+
+export default AuthModal;

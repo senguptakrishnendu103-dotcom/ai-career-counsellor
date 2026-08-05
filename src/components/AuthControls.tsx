@@ -1,12 +1,14 @@
+"use client";
+
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { AuthModal } from "@/components/AuthModal";
+import AuthModal from "@/components/AuthModal";
 
 /**
  * AuthControls renders the login / signup button, logout button, and the modal.
  * It lives inside the AuthProvider so it has access to the authentication state.
  */
-export const AuthControls: React.FC = () => {
+const AuthControls: React.FC = () => {
   const { user, signOut } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -21,12 +23,12 @@ export const AuthControls: React.FC = () => {
         setMode={setAuthMode}
       />
 
-      {/* Top‑right auth button */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Top-right auth button */}
+      <div className="fixed top-4 right-4 z-50">
         {user ? (
           <button
             onClick={signOut}
-            className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-500"
+            className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-500 transition-colors"
           >
             Log Out
           </button>
@@ -36,7 +38,7 @@ export const AuthControls: React.FC = () => {
               setAuthMode("login");
               setAuthOpen(true);
             }}
-            className="rounded bg-purple-600 px-3 py-1 text-sm text-white hover:bg-purple-500"
+            className="rounded bg-purple-600 px-3 py-1 text-sm text-white hover:bg-purple-500 transition-colors"
           >
             Log In / Sign Up
           </button>
@@ -45,3 +47,5 @@ export const AuthControls: React.FC = () => {
     </>
   );
 };
+
+export default AuthControls;

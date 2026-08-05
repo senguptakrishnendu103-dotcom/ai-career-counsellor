@@ -1,37 +1,68 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { NextResponse } from "next/server";
-import type { Database } from "@/types/supabase"; // optional, placeholder for DB types
+import type { NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 /**
- * API route for fetching and updating user profile data.
- * Supports GET (fetch) and PUT (update) methods.
+ * Helper: create a Supabase client authenticated with the request's
+ * Authorization header (Bearer token).
  */
-export async function GET(request: Request) {
-  const response = NextResponse.next();
-  const supabase = createRouteHandlerClient({ request, response });
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user) {
+function getSupabaseClient(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  const authHeader = request.headers.get("authorization") ?? "";
+
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: authHeader } },
+  });
+}
+
+/**
+ * GET /api/profile – fetch the authenticated user's profile row.
+ */
+export async function GET(request: NextRequest) {
+  const supabase = getSupabaseClient(request);
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
   }
-  const { data, error } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
   return NextResponse.json(data);
 }
 
-export async function PUT(request: Request) {
-  const response = NextResponse.next();
-  const supabase = createRouteHandlerClient({ request, response });
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user) {
+/**
+ * PUT /api/profile – upsert the authenticated user's profile row.
+ */
+export async function PUT(request: NextRequest) {
+  const supabase = getSupabaseClient(request);
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
   }
+
   const body = await request.json();
   const { error } = await supabase.from("profiles").upsert({
-    id: session.user.id,
+    id: user.id,
     ...body,
+    updated_at: new Date().toISOString(),
   });
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
