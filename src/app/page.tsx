@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import AuthModal from "@/components/AuthModal";
 import {
   Sparkles,
   UploadCloud,
@@ -3364,6 +3365,14 @@ export default function CareerCounsellor() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* F. Auth Modal */}
+      <AuthModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        mode={authMode === "forgot" ? "login" : authMode}
+        setMode={(m) => setAuthMode(m)}
+      />
     </div>
   );
 }
