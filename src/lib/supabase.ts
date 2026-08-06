@@ -1,20 +1,13 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const DEFAULT_SUPABASE_URL = "https://hsdgkcsxuxefguvqufye.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzZGdrY3N4dXhlZmd1dnF1ZnllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0Njg3MTMsImV4cCI6MjEwMTA0NDcxM30.Z0MCrqr4dosR3Q7_QEWEW6d55kEuTY6qNNXiYVSGh34";
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    "⚠️ Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing. Add them to your .env file to enable persistence."
-  );
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
-/**
- * Always export a non-null SupabaseClient so consumers don't need null checks.
- * If env vars are missing the client will still be created but API calls will fail
- * gracefully — this prevents build-time crashes from nullable references.
- */
 export const supabase: SupabaseClient = createClient(
-  supabaseUrl || "https://placeholder.supabase.co",
-  supabaseAnonKey || "placeholder-anon-key"
+  supabaseUrl,
+  supabaseAnonKey
 );
