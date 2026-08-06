@@ -18,11 +18,6 @@ interface AuthContextProps {
     data?: Record<string, any>
   ) => Promise<{ error?: any; user?: User }>;
   signIn: (email: string, password: string) => Promise<{ error?: any; user?: User }>;
-  signUp: (
-    email: string,
-    password: string,
-    data?: Record<string, any>
-  ) => Promise<{ error?: any; user?: User }>;
   signInWithOAuth: (provider: "google" | "github") => Promise<{ error?: any }>;
   sendMagicLink: (email: string) => Promise<{ error?: any }>;
   signOut: () => Promise<{ error?: any }>;
