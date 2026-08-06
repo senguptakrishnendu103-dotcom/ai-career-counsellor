@@ -142,14 +142,30 @@ export default function CareerCounsellor() {
   // Helper: build a fresh UserProfile from a Supabase User object + optional profile row
   const buildUserProfile = (sbUser: any, profileRow?: any): UserProfile => {
     const meta = sbUser.user_metadata || {};
+    const rawEmail = profileRow?.email || sbUser.email || "";
+    const emailName = rawEmail ? rawEmail.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) : "User";
+    const computedName =
+      profileRow?.name ||
+      meta.name ||
+      meta.full_name ||
+      meta.user_name ||
+      meta.preferred_username ||
+      emailName;
+
+    const computedAvatar =
+      profileRow?.avatar ||
+      meta.avatar_url ||
+      meta.picture ||
+      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(computedName)}`;
+
     if (profileRow) {
       // If a profiles-table row exists, use it (spread keeps all persisted fields)
       return {
-        name: profileRow.name || meta.name || sbUser.email?.split("@")[0] || "User",
-        email: profileRow.email || sbUser.email || "",
-        avatar: profileRow.avatar || meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${meta.name || sbUser.email}`,
+        name: computedName,
+        email: rawEmail,
+        avatar: computedAvatar,
         streak: profileRow.streak ?? 0,
-        role: profileRow.role || (sbUser.email?.includes("admin") ? "admin" : "user"),
+        role: profileRow.role || (rawEmail.includes("admin") ? "admin" : "user"),
         savedCareers: profileRow.savedCareers ?? [],
         assessmentHistory: profileRow.assessmentHistory ?? [],
         completedSteps: profileRow.completedSteps ?? 0,
@@ -176,11 +192,11 @@ export default function CareerCounsellor() {
     }
     // No profile row — build defaults from auth metadata
     return {
-      name: meta.name || sbUser.email?.split("@")[0] || "User",
-      email: sbUser.email || "",
-      avatar: meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${meta.name || sbUser.email}`,
+      name: computedName,
+      email: rawEmail,
+      avatar: computedAvatar,
       streak: 0,
-      role: sbUser.email?.includes("admin") ? "admin" : "user",
+      role: rawEmail.includes("admin") ? "admin" : "user",
       savedCareers: [],
       assessmentHistory: [],
       completedSteps: 0,
