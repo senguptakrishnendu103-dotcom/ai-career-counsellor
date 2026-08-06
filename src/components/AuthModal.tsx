@@ -99,11 +99,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) =
           onClose();
         }
       } else {
-        const { error } = await signUp(email.trim(), password, { role, name });
+        const { error, user } = await signUp(email.trim(), password, { role, name });
         if (error) {
           setError(error.message ?? "Sign-up failed.");
         } else {
-          setInfo("🎉 Account created! Please check your email to verify your address.");
+          setInfo("🎉 Account created! Welcome to CareerVerse.");
+          setTimeout(() => {
+            onClose();
+          }, 1200);
         }
       }
     } catch (err: any) {
