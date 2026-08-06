@@ -31,9 +31,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) =
     setError(null);
     setInfo(null);
     setIsSubmitting(true);
-    const { error } = await signInWithOAuth("google");
-    if (error) {
-      setError(error.message ?? "Google sign-in failed. Please try again.");
+    try {
+      const res = await signInWithOAuth("google");
+      if (res?.error) {
+        // Fallback to local Google OAuth route if provider is not configured in Supabase Dashboard
+        window.location.href = "/google-login";
+      }
+    } catch (_err) {
+      window.location.href = "/google-login";
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -49,13 +55,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) =
     }
 
     setIsSubmitting(true);
-    const { error } = await sendMagicLink(email.trim());
-    setIsSubmitting(false);
-
-    if (error) {
-      setError(error.message ?? "Could not send magic link.");
-    } else {
-      setInfo("✨ Instant login link sent! Check your email inbox to sign in without a password.");
+    try {
+      const { error } = await sendMagicLink(email.trim());
+      if (error) {
+        setError(error.message ?? "Could not send magic link.");
+      } else {
+        setInfo("✨ Instant login link sent! Check your email inbox to sign in without a password.");
+      }
+    } catch (err: any) {
+      setError(err?.message ?? "An error occurred sending magic link.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -76,26 +86,30 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) =
 
     setIsSubmitting(true);
 
-    if (mode === "login") {
-      const { error } = await signIn(email.trim(), password);
-      setIsSubmitting(false);
-      if (error) {
-        if (error.message?.includes("Invalid login credentials")) {
-          setError("Incorrect email or password. Try resetting your password if you forgot it.");
+    try {
+      if (mode === "login") {
+        const { error } = await signIn(email.trim(), password);
+        if (error) {
+          if (error.message?.includes("Invalid login credentials")) {
+            setError("Incorrect email or password. Try resetting your password if you forgot it.");
+          } else {
+            setError(error.message ?? "Login failed. Please try again.");
+          }
         } else {
-          setError(error.message ?? "Login failed. Please try again.");
+          onClose();
         }
       } else {
-        onClose();
+        const { error } = await signUp(email.trim(), password, { role, name });
+        if (error) {
+          setError(error.message ?? "Sign-up failed.");
+        } else {
+          setInfo("🎉 Account created! Please check your email to verify your address.");
+        }
       }
-    } else {
-      const { error } = await signUp(email.trim(), password, { role, name });
+    } catch (err: any) {
+      setError(err?.message ?? "An unexpected error occurred. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      if (error) {
-        setError(error.message ?? "Sign-up failed.");
-      } else {
-        setInfo("🎉 Account created! Please check your email to verify your address.");
-      }
     }
   };
 
@@ -107,13 +121,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode, setMode }) =
       return;
     }
     setIsSubmitting(true);
-    const { error } = await resetPassword(email.trim());
-    setIsSubmitting(false);
-
-    if (error) {
-      setError(error.message ?? "Reset failed");
-    } else {
-      setInfo("🔑 Password reset link sent to your email.");
+    try {
+      const { error } = await resetPassword(email.trim());
+      if (error) {
+        setError(error.message ?? "Reset failed");
+      } else {
+        setInfo("🔑 Password reset link sent to your email.");
+      }
+    } catch (err: any) {
+      setError(err?.message ?? "Password reset error.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
