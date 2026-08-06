@@ -18,6 +18,13 @@ interface AuthContextProps {
     data?: Record<string, any>
   ) => Promise<{ error?: any; user?: User }>;
   signIn: (email: string, password: string) => Promise<{ error?: any; user?: User }>;
+  signUp: (
+    email: string,
+    password: string,
+    data?: Record<string, any>
+  ) => Promise<{ error?: any; user?: User }>;
+  signInWithOAuth: (provider: "google" | "github") => Promise<{ error?: any }>;
+  sendMagicLink: (email: string) => Promise<{ error?: any }>;
   signOut: () => Promise<{ error?: any }>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
 }
@@ -96,6 +103,30 @@ const AuthProvider = ({ children }: ProviderProps) => {
     return { user: signInData.user };
   };
 
+  const signInWithOAuth = async (provider: "google" | "github") => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${origin}`,
+      },
+    });
+    if (error) return { error };
+    return {};
+  };
+
+  const sendMagicLink = async (email: string) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${origin}`,
+      },
+    });
+    if (error) return { error };
+    return {};
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) return { error };
@@ -119,6 +150,8 @@ const AuthProvider = ({ children }: ProviderProps) => {
     role,
     signUp,
     signIn,
+    signInWithOAuth,
+    sendMagicLink,
     signOut,
     resetPassword,
   };
